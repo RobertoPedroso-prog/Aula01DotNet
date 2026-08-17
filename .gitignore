@@ -1,0 +1,17 @@
+## .NET
+bin/
+obj/
+
+## Rider / JetBrains
+.idea/
+
+## VS Code
+.vs/
+.vscode/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Claude Code local settings
+.claude/settings.local.json

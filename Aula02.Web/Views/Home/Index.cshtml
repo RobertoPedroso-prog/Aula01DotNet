@@ -1,0 +1,15 @@
+﻿@model List<Aula02.Web.DTOs.UsuarioDto>
+
+@{
+    ViewData["Title"] = "Lista de Usuários";
+}
+
+<h2>Usuários Ativos</h2>
+
+<ul>
+    @foreach (var usuario in Model)
+    {
+        <li><strong>ID:</strong> @usuario.Id - <strong>Nome:</strong> @usuario.Nome</li>
+    }
+</ul>
+
