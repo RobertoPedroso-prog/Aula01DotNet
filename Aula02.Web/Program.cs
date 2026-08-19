@@ -8,6 +8,7 @@ builder.Services.AddControllersWithViews();
 
 // Registrando a abstração e a implementação
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IProdutoService, ProdutoService>();
 
 var app = builder.Build();
 
