@@ -1,0 +1,29 @@
+@page "{id:int}"
+@model Aula05.Web.Pages.Produtos.EditModel
+
+@{
+    ViewData["Title"] = "Editar Produto";
+}
+
+<h2>Editar Produto</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="Produto.Id" />
+    <partial name="_ProdutoForm" for="Produto" />
+
+    <div class="form-group mb-3">
+        <label>Categoria</label>
+        <select asp-for="Produto.CategoriaId"
+                asp-items="Model.Categorias"
+                class="form-select">
+        </select>
+        <span asp-validation-for="Produto.CategoriaId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
