@@ -1,8 +1,25 @@
-﻿@{
+@model Aula05.Web.Models.Produto?
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero">
+    <h1>Loja OnLine</h1>
+    <p>Os melhores produtos, direto do nosso catálogo.</p>
+</section>
+
+@if (Model != null)
+{
+    <a asp-page="/Produtos/Details" asp-route-id="@Model.Id" class="promo-card">
+        <span class="promo-card__tag">Promoção da Semana</span>
+        <span class="promo-card__nome">@Model.Nome</span>
+        <span class="promo-card__categoria">@Model.Categoria?.Nome</span>
+        <span class="promo-card__preco">@Model.Preco.ToString("C")</span>
+        <span class="promo-card__cta">Ver produto →</span>
+    </a>
+}
+else
+{
+    <p class="text-center text-muted">Nenhum produto cadastrado ainda.</p>
+}

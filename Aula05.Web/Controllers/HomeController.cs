@@ -1,14 +1,29 @@
 using System.Diagnostics;
+using Aula05.Web.Data;
 using Microsoft.AspNetCore.Mvc;
 using Aula05.Web.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aula05.Web.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly AppDbContext _context;
+
+    public HomeController(AppDbContext context)
     {
-        return View();
+        _context = context;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var promocaoDaSemana = await _context.Produtos
+            .Include(p => p.Categoria)
+            .AsNoTracking()
+            .OrderBy(p => p.Preco)
+            .FirstOrDefaultAsync();
+
+        return View(promocaoDaSemana);
     }
 
     public IActionResult Privacy()

@@ -1,5 +1,7 @@
+using System.Globalization;
 using Aula05.Web.Data;
 using Aula05.Web.Filters;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +33,17 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
+
+// Cultura fixa em pt-BR: garante que "349,90" seja interpretado como decimal
+// (349.90) tanto no binding quanto na exibição, independente da cultura do SO.
+var ptBrCulture = new CultureInfo("pt-BR");
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(ptBrCulture),
+    SupportedCultures = [ptBrCulture],
+    SupportedUICultures = [ptBrCulture]
+});
+
 app.UseRouting();
 
 app.UseAuthorization();

@@ -28,6 +28,7 @@
         <td>@p.Preco.ToString("C")</td>
         <td>@p.Categoria?.Nome</td>
         <td>
+            <a asp-page="Details" asp-route-id="@p.Id">Detalhes</a> |
             <a asp-page="Edit" asp-route-id="@p.Id">Editar</a> |
             <a asp-page="Delete" asp-route-id="@p.Id">Excluir</a>
         </td>
