@@ -1,0 +1,45 @@
+@page
+@model Aula06.Web.Pages.Produtos.IndexModel
+
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+<h2>Produtos</h2>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Novo Produto</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Imagem</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Categoria</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var p in Model.Produtos)
+{
+    <tr>
+        <td>
+            @if (!string.IsNullOrEmpty(p.Imagem))
+            {
+                <img src="~/imagens/@p.Imagem" width="80" />
+            }
+        </td>
+        <td>@p.Nome</td>
+        <td>@p.Preco.ToString("C")</td>
+        <td>@p.Categoria?.Nome</td>
+        <td>
+            <a asp-page="Details" asp-route-id="@p.Id">Detalhes</a> |
+            <a asp-page="Edit" asp-route-id="@p.Id">Editar</a> |
+            <a asp-page="Delete" asp-route-id="@p.Id">Excluir</a>
+        </td>
+    </tr>
+}
+    </tbody>
+</table>

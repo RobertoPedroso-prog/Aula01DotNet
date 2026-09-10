@@ -1,0 +1,9 @@
+@model string?
+
+<div class="container">
+    &copy; 2026 - Aula06.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    @if (!string.IsNullOrEmpty(Model))
+    {
+        <span class="text-muted"> | Última página visitada: @Model</span>
+    }
+</div>

@@ -1,0 +1,44 @@
+@page "{id:int}"
+@model Aula06.Web.Pages.Produtos.EditModel
+
+@{
+    ViewData["Title"] = "Editar Produto";
+}
+
+<h2>Editar Produto</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Produto.Id" />
+    <input type="hidden" asp-for="Produto.Imagem" />
+    <partial name="_ProdutoForm" for="Produto" />
+
+    <div class="form-group mb-3">
+        <label>Categoria</label>
+        <select asp-for="Produto.CategoriaId"
+                asp-items="Model.Categorias"
+                class="form-select">
+        </select>
+        <span asp-validation-for="Produto.CategoriaId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Imagem</label>
+        @if (!string.IsNullOrEmpty(Model.Produto.Imagem))
+        {
+            <div class="mb-2">
+                <img src="~/imagens/@Model.Produto.Imagem" width="120" class="rounded" />
+            </div>
+        }
+        <input type="file" name="ImagemUpload" class="form-control" accept=".png,.jpg,.jpeg" />
+        <span asp-validation-for="ImagemUpload" class="text-danger"></span>
+        <small class="form-text text-muted">Envie um novo arquivo apenas se quiser substituir a imagem atual.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/validation-ptbr.js"></script>
+}

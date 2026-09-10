@@ -1,0 +1,18 @@
+@page "{id:int}"
+@model Aula06.Web.Pages.Produtos.DeleteModel
+
+@{
+    ViewData["Title"] = "Excluir Produto";
+}
+
+<h2>Excluir Produto</h2>
+
+<p class="text-danger">Tem certeza que deseja excluir este produto?</p>
+
+<partial name="_ProdutoResumo" model="Model.Produto" />
+
+<form method="post">
+    <input type="hidden" asp-for="Produto.Id" />
+    <button type="submit" class="btn btn-danger">Excluir</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
