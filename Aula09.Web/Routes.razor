@@ -1,0 +1,15 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Aula09.Web.Layouts
+
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Página não encontrada</PageTitle>
+        <LayoutView Layout="typeof(MainLayout)">
+            <p role="alert">Desculpe, não conseguimos encontrar essa página.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

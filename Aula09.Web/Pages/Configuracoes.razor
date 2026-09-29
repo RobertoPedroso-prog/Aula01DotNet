@@ -1,0 +1,44 @@
+@page "/configuracoes"
+@using Aula09.Web.Services
+@inject TemaService TemaService
+
+<h1>Configurações</h1>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Aparência</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">Tema</label>
+            <div class="btn-group" role="group">
+                <button type="button"
+                        class="btn @(TemaService.Tema == "light" ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="AlterarParaLight">
+                    ☀️ Claro
+                </button>
+                <button type="button"
+                        class="btn @(TemaService.Tema == "dark" ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="AlterarParaDark">
+                    🌙 Escuro
+                </button>
+            </div>
+        </div>
+        <p class="text-muted">Tema atual: <strong>@(TemaService.Tema == "light" ? "Claro" : "Escuro")</strong></p>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        TemaService.OnTemaChanged += StateHasChanged;
+    }
+
+    private void AlterarParaLight() => TemaService.AlterarTema("light");
+    private void AlterarParaDark() => TemaService.AlterarTema("dark");
+
+    public void Dispose()
+    {
+        TemaService.OnTemaChanged -= StateHasChanged;
+    }
+}

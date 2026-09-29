@@ -1,0 +1,66 @@
+@using Aula09.Web.Models
+
+<div class="card">
+    <div class="card-header">
+        <h4>Lista de Produtos</h4>
+    </div>
+    <div class="card-body">
+        @if (Produtos == null || Produtos.Count == 0)
+        {
+            <p class="text-muted">Nenhum produto cadastrado.</p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Categoria</th>
+                        <th>Ativo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var produto in Produtos)
+                    {
+                        <tr>
+                            <td>@produto.Nome</td>
+                            <td>@produto.Preco.ToString("C")</td>
+                            <td>@produto.Categoria?.Nome</td>
+                            <td>
+                                @if (produto.Ativo)
+                                {
+                                    <span class="badge bg-success">Ativo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inativo</span>
+                                }
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info" @onclick="() => OnSelecionar.InvokeAsync(produto.Id)">
+                                    Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-danger" @onclick="() => OnExcluirSolicitado.InvokeAsync(produto.Id)">
+                                    Excluir
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<Produto>? Produtos { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnSelecionar { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnExcluirSolicitado { get; set; }
+}

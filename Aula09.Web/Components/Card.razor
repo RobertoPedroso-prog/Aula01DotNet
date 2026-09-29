@@ -1,0 +1,25 @@
+@* Componente Card com RenderFragment para máxima flexibilidade *@
+
+<div class="card">
+    <div class="card-header">
+        @if (!string.IsNullOrEmpty(Icone))
+        {
+            <i class="@Icone"></i>
+        }
+        <h5>@Titulo</h5>
+    </div>
+    <div class="card-body">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Titulo { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Icone { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

@@ -1,0 +1,104 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Aula09.Web.Models
+@using Aula09.Web.Services
+@inject ProdutoService ProdutoService
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>Novo Produto</h4>
+    </div>
+    <div class="card-body">
+        <EditForm EditContext="editContext" OnValidSubmit="Salvar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome</label>
+                <InputText id="nome" class="form-control" @bind-Value="Produto.Nome" placeholder="Digite o nome" />
+            </div>
+
+            <div class="mb-3">
+                <label for="preco" class="form-label">Preço</label>
+                <InputNumber id="preco" class="form-control" @bind-Value="Produto.Preco" placeholder="0,00" />
+            </div>
+
+            <div class="mb-3">
+                <label for="estoque" class="form-label">Estoque</label>
+                <InputNumber id="estoque" class="form-control" @bind-Value="Produto.Estoque" placeholder="0" />
+            </div>
+
+            <div class="mb-3">
+                <label for="categoria" class="form-label">Categoria</label>
+                <InputSelect id="categoria" class="form-control" @bind-Value="Produto.CategoriaId">
+                    <option value="">Selecione uma categoria</option>
+                    @foreach (var cat in Categorias)
+                    {
+                        <option value="@cat.Id">@cat.Nome</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <InputCheckbox id="ativo" class="form-check-input" @bind-Value="Produto.Ativo" />
+                    <label for="ativo" class="form-check-label">Ativo</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Produto Produto = new() { Nome = string.Empty };
+    private EditContext editContext;
+    private ValidationMessageStore messages;
+    private List<Categoria> Categorias = [];
+
+    [Parameter]
+    public EventCallback<Produto> OnSalvar { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categorias = await ProdutoService.ObterCategoriasAsync();
+        editContext = new EditContext(Produto);
+        messages = new ValidationMessageStore(editContext);
+        editContext.OnValidationRequested += ValidacaoCustomizada;
+    }
+
+    private void ValidacaoCustomizada(object sender, ValidationRequestedEventArgs e)
+    {
+        messages.Clear();
+
+        if (Produto.Estoque < 0)
+        {
+            messages.Add(() => Produto.Estoque, "Estoque não pode ser negativo");
+        }
+
+        if (Produto.CategoriaId > 0)
+        {
+            var categoria = Categorias.FirstOrDefault(c => c.Id == Produto.CategoriaId);
+            decimal precoMinimo = categoria?.Nome == "Eletrônicos" ? 100 : 10;
+
+            if (Produto.Preco < precoMinimo)
+            {
+                messages.Add(() => Produto.Preco, $"Preço mínimo para {categoria?.Nome} é R$ {precoMinimo}");
+            }
+        }
+
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private async Task Salvar()
+    {
+        if (editContext.Validate())
+        {
+            await OnSalvar.InvokeAsync(Produto);
+            Produto = new() { Nome = string.Empty };
+            editContext = new EditContext(Produto);
+            messages = new ValidationMessageStore(editContext);
+            editContext.OnValidationRequested += ValidacaoCustomizada;
+        }
+    }
+}
