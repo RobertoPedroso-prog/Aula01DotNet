@@ -1,0 +1,83 @@
+@page "/produtos"
+@using Aula08.Web.Models
+@using Aula08.Web.Services
+@inject ProdutoService ProdutoService
+
+<div class="container mt-5">
+    <h1>Gerenciamento de Produtos (Blazor Server)</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <ProdutoForm OnSalvar="AdicionarProduto" />
+        </div>
+        <div class="col-md-6">
+            <CascadingValue Value="ProdutoSelecionado">
+                <ProdutoDetalhe />
+            </CascadingValue>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <ProdutoList Produtos="ListaProdutos" OnSelecionar="SelecionarProduto" OnExcluirSolicitado="SolicitarExclusao" />
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <ConfirmarExclusao IdParaExcluir="IdParaExcluir" OnConfirmar="RealizarExclusao" OnCancelar="RealizarCancelamento" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Produto> ListaProdutos = [];
+    private Produto? ProdutoSelecionado;
+    private int? IdParaExcluir;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CarregarProdutos();
+    }
+
+    private async Task CarregarProdutos()
+    {
+        ListaProdutos = await ProdutoService.ObterTodosAsync();
+    }
+
+    private async Task AdicionarProduto(Produto produto)
+    {
+        if (produto.CategoriaId > 0)
+        {
+            await ProdutoService.AdicionarAsync(produto);
+            await CarregarProdutos();
+            ProdutoSelecionado = null;
+        }
+    }
+
+    private async Task SelecionarProduto(int id)
+    {
+        ProdutoSelecionado = await ProdutoService.ObterPorIdAsync(id);
+    }
+
+    private void SolicitarExclusao(int id)
+    {
+        IdParaExcluir = id;
+    }
+
+    private async Task RealizarExclusao()
+    {
+        if (IdParaExcluir.HasValue)
+        {
+            await ProdutoService.RemoverAsync(IdParaExcluir.Value);
+            await CarregarProdutos();
+            ProdutoSelecionado = null;
+            IdParaExcluir = null;
+        }
+    }
+
+    private void RealizarCancelamento()
+    {
+        IdParaExcluir = null;
+    }
+}

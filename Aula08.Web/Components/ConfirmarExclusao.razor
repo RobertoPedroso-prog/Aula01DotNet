@@ -1,0 +1,38 @@
+@using Aula08.Web.Models
+
+@if (IdParaExcluir.HasValue)
+{
+    <div class="alert alert-warning mt-3" role="alert">
+        <h5>Confirmar exclusão</h5>
+        <p>Tem certeza que deseja excluir este produto?</p>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-danger" @onclick="RealizarExclusao">
+                Sim, excluir
+            </button>
+            <button type="button" class="btn btn-secondary" @onclick="RealizarCancelamento">
+                Cancelar
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int? IdParaExcluir { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirmar { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelar { get; set; }
+
+    private async Task RealizarExclusao()
+    {
+        await OnConfirmar.InvokeAsync();
+    }
+
+    private async Task RealizarCancelamento()
+    {
+        await OnCancelar.InvokeAsync();
+    }
+}

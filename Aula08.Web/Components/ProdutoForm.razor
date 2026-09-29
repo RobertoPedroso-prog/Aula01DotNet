@@ -1,0 +1,64 @@
+@using Aula08.Web.Models
+@using Aula08.Web.Services
+@inject ProdutoService ProdutoService
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>Novo Produto</h4>
+    </div>
+    <div class="card-body">
+        <EditForm Model="NovoProduto" OnValidSubmit="Salvar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome</label>
+                <InputText id="nome" class="form-control" @bind-Value="NovoProduto.Nome" placeholder="Digite o nome do produto" />
+            </div>
+
+            <div class="mb-3">
+                <label for="preco" class="form-label">Preço</label>
+                <InputNumber id="preco" class="form-control" @bind-Value="NovoProduto.Preco" placeholder="0,00" />
+            </div>
+
+            <div class="mb-3">
+                <label for="categoria" class="form-label">Categoria</label>
+                <InputSelect id="categoria" class="form-control" @bind-Value="NovoProduto.CategoriaId">
+                    <option value="">Selecione uma categoria</option>
+                    @foreach (var cat in Categorias)
+                    {
+                        <option value="@cat.Id">@cat.Nome</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <InputCheckbox id="ativo" class="form-check-input" @bind-Value="NovoProduto.Ativo" />
+                    <label for="ativo" class="form-check-label">Ativo</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Produto NovoProduto = new() { Nome = string.Empty };
+    private List<Categoria> Categorias = [];
+
+    [Parameter]
+    public EventCallback<Produto> OnSalvar { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categorias = await ProdutoService.ObterCategoriasAsync();
+    }
+
+    private async Task Salvar()
+    {
+        await OnSalvar.InvokeAsync(NovoProduto);
+        NovoProduto = new() { Nome = string.Empty };
+    }
+}
