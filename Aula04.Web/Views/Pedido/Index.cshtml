@@ -1,0 +1,40 @@
+@model List<Aula04.Web.Models.Pedido>
+
+@{
+    ViewData["Title"] = "Pedidos";
+}
+
+<h2>Pedidos</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Novo Pedido</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Data</th>
+        <th>Produtos</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var pedido in Model)
+    {
+        <tr>
+            <td>@pedido.Id</td>
+            <td>@pedido.DataPedido.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>
+                <ul class="mb-0">
+                    @foreach (var produto in pedido.Produtos)
+                    {
+                        <li>@produto.Nome (@produto.Preco.ToString("C"))</li>
+                    }
+                </ul>
+            </td>
+            <td>@pedido.Produtos.Sum(p => p.Preco).ToString("C")</td>
+        </tr>
+    }
+    </tbody>
+</table>

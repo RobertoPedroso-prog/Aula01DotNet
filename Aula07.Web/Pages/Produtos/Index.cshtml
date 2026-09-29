@@ -1,0 +1,76 @@
+@page
+@model Aula07.Web.Pages.Produtos.IndexModel
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Catálogo de Produtos</h2>
+        <p class="text-muted mb-0">Gestão administrativa com controle de acesso por perfil</p>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-page="Create" class="btn btn-primary">
+            + Novo Produto
+        </a>
+    }
+</div>
+
+<div class="table-responsive bg-white rounded shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 80px;">Imagem</th>
+                <th>Nome</th>
+                <th>Preço</th>
+                <th>Categoria</th>
+                <th>Status</th>
+                <th class="text-end" style="min-width: 220px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in Model.Produtos)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(p.Imagem))
+                    {
+                        <img src="~/imagens/@p.Imagem" width="60" height="60" class="rounded object-fit-cover border" alt="@p.Nome" />
+                    }
+                    else
+                    {
+                        <div class="bg-light text-muted d-flex align-items-center justify-content-center rounded border" style="width: 60px; height: 60px; font-size: 10px;">
+                            Sem img
+                        </div>
+                    }
+                </td>
+                <td><strong>@p.Nome</strong></td>
+                <td>@p.Preco.ToString("C")</td>
+                <td><span class="badge bg-secondary">@p.Categoria?.Nome</span></td>
+                <td>
+                    @if (p.Ativo)
+                    {
+                        <span class="badge bg-success">Ativo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inativo</span>
+                    }
+                </td>
+                <td class="text-end">
+                    <a asp-page="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-info">Detalhes</a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
+                    {
+                        <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-warning ms-1">Editar</a>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-page="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger ms-1">Excluir</a>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -10,7 +10,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // DbContext com PostgreSQL e schema 'aula08'
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddPooledDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ProdutoService
@@ -19,9 +19,8 @@ builder.Services.AddScoped<ProdutoService>();
 var app = builder.Build();
 
 // Migrations automáticas e Seed no startup
-using (var scope = app.Services.CreateScope())
+using (var context = app.Services.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
     DbInitializer.Seed(context);
 }
@@ -33,6 +32,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

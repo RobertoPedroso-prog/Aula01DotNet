@@ -1,0 +1,63 @@
+@page
+@model Aula07.Web.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Criar Nova Conta";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-3">Criar Conta</h2>
+                <p class="text-muted text-center mb-4">Cadastre-se para acessar o sistema administrativo</p>
+
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Email" class="form-label">E-mail</label>
+                        <input asp-for="Input.Email" class="form-control" placeholder="nome@exemplo.com" autofocus />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Departamento" class="form-label">Departamento (Claim)</label>
+                        <select asp-for="Input.Departamento" class="form-select">
+                            <option value="TI">TI</option>
+                            <option value="Operações">Operações</option>
+                            <option value="Vendas">Vendas</option>
+                            <option value="Financeiro">Financeiro</option>
+                        </select>
+                        <span asp-validation-for="Input.Departamento" class="text-danger"></span>
+                        <div class="form-text">Este atributo será gravado como Claim no seu usuário.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Password" class="form-label">Senha</label>
+                        <input asp-for="Input.Password" class="form-control" placeholder="Mínimo de 6 caracteres" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Input.ConfirmPassword" class="form-label">Confirmar Senha</label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Cadastrar</button>
+                </form>
+
+                <hr class="my-4" />
+
+                <div class="text-center">
+                    <span>Já tem uma conta? </span>
+                    <a asp-page="./Login">Faça login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

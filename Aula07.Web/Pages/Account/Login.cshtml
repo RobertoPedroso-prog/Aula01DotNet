@@ -1,0 +1,59 @@
+@page
+@model Aula07.Web.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Entrar no Sistema";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-3">Login</h2>
+                <p class="text-muted text-center mb-4">Acesse com suas credenciais</p>
+
+                <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Email" class="form-label">E-mail</label>
+                        <input asp-for="Input.Email" class="form-control" placeholder="nome@exemplo.com" autofocus />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Password" class="form-label">Senha</label>
+                        <input asp-for="Input.Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="Input.RememberMe" class="form-check-input" />
+                        <label asp-for="Input.RememberMe" class="form-check-label">Lembrar de mim</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Entrar</button>
+                </form>
+
+                <div class="mt-4 p-3 bg-light rounded small">
+                    <strong>Contas de teste pré-configuradas:</strong>
+                    <ul class="mb-0 mt-2 ps-3">
+                        <li><code>admin@aula07.com</code> / <code>Admin123!</code> (Role: <strong>Admin</strong>, Depto: <strong>TI</strong>)</li>
+                        <li><code>gerente@aula07.com</code> / <code>Gerente123!</code> (Role: <strong>Gerente</strong>, Depto: <strong>Operações</strong>)</li>
+                        <li><code>usuario@aula07.com</code> / <code>Usuario123!</code> (Role: <strong>Usuario</strong>, Depto: <strong>Vendas</strong>)</li>
+                    </ul>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="text-center">
+                    <span>Não tem uma conta? </span>
+                    <a asp-page="./Register">Criar nova conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

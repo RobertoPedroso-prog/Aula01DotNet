@@ -6,47 +6,53 @@ namespace Aula08.Web.Services;
 
 public class ProdutoService
 {
-    private readonly AppDbContext _context;
+    private readonly IDbContextFactory<AppDbContext> _factory;
 
-    public ProdutoService(AppDbContext context)
+    public ProdutoService(IDbContextFactory<AppDbContext> factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task<List<Produto>> ObterTodosAsync()
     {
-        return await _context.Produtos.Include(p => p.Categoria).ToListAsync();
+        using var context = _factory.CreateDbContext();
+        return await context.Produtos.Include(p => p.Categoria).ToListAsync();
     }
 
     public async Task<Produto?> ObterPorIdAsync(int id)
     {
-        return await _context.Produtos.Include(p => p.Categoria).FirstOrDefaultAsync(p => p.Id == id);
+        using var context = _factory.CreateDbContext();
+        return await context.Produtos.Include(p => p.Categoria).FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<List<Categoria>> ObterCategoriasAsync()
     {
-        return await _context.Categorias.ToListAsync();
+        using var context = _factory.CreateDbContext();
+        return await context.Categorias.ToListAsync();
     }
 
     public async Task AdicionarAsync(Produto produto)
     {
-        _context.Produtos.Add(produto);
-        await _context.SaveChangesAsync();
+        using var context = _factory.CreateDbContext();
+        context.Produtos.Add(produto);
+        await context.SaveChangesAsync();
     }
 
     public async Task AtualizarAsync(Produto produto)
     {
-        _context.Produtos.Update(produto);
-        await _context.SaveChangesAsync();
+        using var context = _factory.CreateDbContext();
+        context.Produtos.Update(produto);
+        await context.SaveChangesAsync();
     }
 
     public async Task RemoverAsync(int id)
     {
-        var produto = await _context.Produtos.FindAsync(id);
+        using var context = _factory.CreateDbContext();
+        var produto = await context.Produtos.FindAsync(id);
         if (produto != null)
         {
-            _context.Produtos.Remove(produto);
-            await _context.SaveChangesAsync();
+            context.Produtos.Remove(produto);
+            await context.SaveChangesAsync();
         }
     }
 }

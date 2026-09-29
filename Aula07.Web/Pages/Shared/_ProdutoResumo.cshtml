@@ -1,0 +1,20 @@
+@model Aula07.Web.Models.Produto
+
+@if (!string.IsNullOrEmpty(Model.Imagem))
+{
+    <img src="~/imagens/@Model.Imagem" width="160" class="mb-3 rounded" />
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Nome</dt>
+    <dd class="col-sm-9">@Model.Nome</dd>
+
+    <dt class="col-sm-3">Preço</dt>
+    <dd class="col-sm-9">@Model.Preco.ToString("C")</dd>
+
+    <dt class="col-sm-3">Categoria</dt>
+    <dd class="col-sm-9">@Model.Categoria?.Nome</dd>
+
+    <dt class="col-sm-3">Ativo</dt>
+    <dd class="col-sm-9">@(Model.Ativo ? "Sim" : "Não")</dd>
+</dl>

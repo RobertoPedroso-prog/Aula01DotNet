@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Início";
+}
+
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold text-primary">Aula 7 — Autenticação e Autorização</h1>
+        <p class="col-md-9 fs-5 text-muted">
+            Sistema com <strong>ASP.NET Core Identity</strong>, cookies server-side, controle de acesso por <strong>Roles</strong> (Admin, Gerente, Usuário) e <strong>Claims</strong> (Departamento), e proteção de páginas Razor.
+        </p>
+        <div class="d-flex gap-2 mt-4">
+            <a asp-page="/Produtos/Index" class="btn btn-primary btn-lg">Acessar Produtos</a>
+            @if (User.Identity?.IsAuthenticated != true)
+            {
+                <a asp-page="/Account/Login" class="btn btn-outline-secondary btn-lg">Fazer Login</a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-primary">🛡️ Perfis de Acesso (Roles)</h5>
+                <p class="card-text text-muted">
+                    - <strong>Admin:</strong> Criar, editar, excluir e visualizar produtos.<br/>
+                    - <strong>Gerente:</strong> Editar e visualizar produtos.<br/>
+                    - <strong>Usuário:</strong> Apenas visualizar produtos.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-primary">🏷️ Atributos (Claims)</h5>
+                <p class="card-text text-muted">
+                    Atributos customizados gravados no usuário, como o <strong>Departamento</strong> (ex.: TI, Operações, Vendas), exibidos dinamicamente na barra superior.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-primary">🔒 Segurança & Boas Práticas</h5>
+                <p class="card-text text-muted">
+                    Proteção global de pastas com <code>AuthorizeFolder("/Produtos")</code>, autenticação baseada em Cookies seguros e tela dedicada de <code>Acesso Negado</code>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,6 +19,8 @@ Thumbs.db
 ## Local exports/backups
 *.zip
 
-## Uploads de teste (Aula06.Web)
+## Uploads de teste (Aula06.Web e Aula07.Web)
 Aula06.Web/wwwroot/imagens/*
 !Aula06.Web/wwwroot/imagens/.gitkeep
+Aula07.Web/wwwroot/imagens/*
+!Aula07.Web/wwwroot/imagens/.gitkeep

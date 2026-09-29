@@ -8,8 +8,6 @@
 
   --color-primary: #4f46e5;
   --color-primary-dark: #4338ca;
-  --color-accent: #f97316;
-  --color-accent-dark: #ea580c;
 
   --radius-sm: 0.5rem;
   --radius-md: 0.9rem;
@@ -197,8 +195,8 @@ dl.row dt {
   max-width: 32rem;
   margin: 0 auto;
   padding: 1.75rem 2rem;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
-  color: #fff;
+  background: linear-gradient(135deg, #6a6207, #dbb95e);
+  color: #221f07;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   text-decoration: none;
@@ -207,8 +205,8 @@ dl.row dt {
 
 .promo-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 30px -10px rgba(234, 88, 12, 0.45);
-  color: #fff;
+  box-shadow: 0 16px 30px -10px rgba(106, 98, 7, 0.45);
+  color: #221f07;
 }
 
 .promo-card__tag {
@@ -217,7 +215,7 @@ dl.row dt {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.9;
+  opacity: 0.75;
 }
 
 .promo-card__nome {
@@ -228,13 +226,14 @@ dl.row dt {
 .promo-card__categoria {
   grid-column: 1 / -1;
   font-size: 0.85rem;
-  opacity: 0.85;
+  opacity: 0.75;
 }
 
 .promo-card__preco {
   font-size: 1.75rem;
   font-weight: 800;
   text-align: right;
+  color: #20ced8;
 }
 
 .promo-card__cta {

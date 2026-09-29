@@ -1,0 +1,31 @@
+@page
+@model Aula07.Web.Pages.Account.AcessoNegadoModel
+@{
+    ViewData["Title"] = "Acesso Negado";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="card border-danger shadow-sm p-4">
+            <div class="card-body">
+                <div class="display-1 text-danger mb-3">⛔</div>
+                <h2 class="text-danger mb-3">Acesso Negado</h2>
+                <p class="lead text-muted">
+                    Seu perfil de usuário atual (ou ausência de permissão) não permite acessar esta página ou executar esta operação.
+                </p>
+                <div class="alert alert-warning text-start small">
+                    <strong>Dica de Permissões:</strong>
+                    <ul class="mb-0 mt-1">
+                        <li><strong>Criar/Excluir produtos:</strong> apenas usuários com perfil <code>Admin</code>.</li>
+                        <li><strong>Editar produtos:</strong> usuários com perfil <code>Admin</code> ou <code>Gerente</code>.</li>
+                        <li><strong>Visualizar produtos:</strong> qualquer usuário autenticado.</li>
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <a asp-page="/Produtos/Index" class="btn btn-primary">Voltar para Produtos</a>
+                    <a asp-page="/Account/Login" class="btn btn-outline-secondary ms-2">Trocar de Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

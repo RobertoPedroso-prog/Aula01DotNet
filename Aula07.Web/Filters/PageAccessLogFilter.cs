@@ -1,0 +1,32 @@
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Aula07.Web.Filters;
+
+public class PageAccessLogFilter : IPageFilter
+{
+    public void OnPageHandlerSelected(PageHandlerSelectedContext context)
+    {
+    }
+
+    public void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        var nomePagina = context.ActionDescriptor.DisplayName ?? "(desconhecida)";
+
+        var logger = context.HttpContext.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("PageAccess");
+
+        logger.LogInformation(
+            "Acesso à página {Page} (handler {Handler}) em {Timestamp:u}",
+            nomePagina,
+            context.HandlerMethod?.Name ?? "(sem handler)",
+            DateTime.UtcNow);
+
+        context.HttpContext.Session.SetString("UltimaPagina", nomePagina);
+    }
+
+    public void OnPageHandlerExecuted(PageHandlerExecutedContext context)
+    {
+    }
+}

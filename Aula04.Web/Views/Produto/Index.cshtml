@@ -1,0 +1,41 @@
+@model List<Aula04.Web.Models.Produto>
+
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+<h2>Produtos</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Novo Produto</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Categoria</th>
+        <th>Preço</th>
+        <th>Ativo</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var produto in Model)
+    {
+        <tr>
+            <td>@produto.Nome</td>
+            <td>@produto.Categoria?.Nome</td>
+            <td>@produto.Preco.ToString("C")</td>
+            <td>@(produto.Ativo ? "Sim" : "Não")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@produto.Id" class="btn btn-sm btn-secondary">Editar</a>
+                <form asp-action="Delete" asp-route-id="@produto.Id" method="post" class="d-inline"
+                      onsubmit="return confirm('Excluir este produto?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
