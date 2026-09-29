@@ -1,0 +1,128 @@
+@page "/produtos"
+@using Aula10.BlazorWasm.Models
+@inject HttpClient Http
+
+<div class="container mt-4">
+    <h1>Produtos</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5>Criar Novo Produto</h5>
+            <EditForm Model="novoProduto" OnValidSubmit="CriarProduto">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label class="form-label">Nome</label>
+                    <InputText class="form-control" @bind-Value="novoProduto.Nome" placeholder="Ex: Mouse" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Preço (R$)</label>
+                    <InputNumber class="form-control" @bind-Value="novoProduto.Preco" step="0.01" />
+                </div>
+
+                <button type="submit" class="btn btn-primary" disabled="@carregando">
+                    @if (carregando)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span>Salvando...</span>
+                    }
+                    else
+                    {
+                        <span>Salvar</span>
+                    }
+                </button>
+
+                @if (!string.IsNullOrEmpty(mensagemErro))
+                {
+                    <div class="alert alert-danger mt-3">@mensagemErro</div>
+                }
+            </EditForm>
+        </div>
+
+        <div class="col-md-6">
+            <h5>Lista de Produtos</h5>
+            @if (produtos == null)
+            {
+                <div class="alert alert-info">Carregando...</div>
+            }
+            else if (!produtos.Any())
+            {
+                <div class="alert alert-warning">Nenhum produto cadastrado</div>
+            }
+            else
+            {
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in produtos)
+                        {
+                            <tr>
+                                <td>@p.Nome</td>
+                                <td>@p.Preco.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ProdutoDto>? produtos;
+    private ProdutoDto novoProduto = new();
+    private bool carregando = false;
+    private string mensagemErro = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CarregarProdutos();
+    }
+
+    private async Task CarregarProdutos()
+    {
+        try
+        {
+            produtos = await Http.GetFromJsonAsync<List<ProdutoDto>>("api/produtos");
+        }
+        catch (Exception ex)
+        {
+            mensagemErro = $"Erro ao carregar produtos: {ex.Message}";
+        }
+    }
+
+    private async Task CriarProduto()
+    {
+        carregando = true;
+        mensagemErro = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/produtos", novoProduto);
+            if (response.IsSuccessStatusCode)
+            {
+                novoProduto = new();
+                await CarregarProdutos();
+            }
+            else
+            {
+                mensagemErro = $"Erro ao criar produto: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensagemErro = $"Erro: {ex.Message}";
+        }
+        finally
+        {
+            carregando = false;
+        }
+    }
+}
