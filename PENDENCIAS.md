@@ -15,9 +15,8 @@ Atualizado em 2026-10-07.
 
 ## Código e git
 
-- [ ] Nada foi commitado ainda (~78 arquivos alterados). Novos e não rastreados: `Hipermidia.Data/`, `Aula08.Web.Tests/`, `Aula09.Web/Components/DashboardResumo.razor`, `Aula09.Web/Services/ProdutoEventos.cs`, `Aula09.Web/Aula_09.pdf` e `.txt`, `PENDENCIAS.md`.
-  As pastas `Migrations` das aulas 04 a 10 foram removidas (continuam no histórico do git).
-- [ ] `Aula08.Web.Tests` ainda não está em `Aula01DotNet.sln`.
+- [x] Commitado em 2026-10-07 (commits 0b2cd33 e e1f2ea4). As pastas `Migrations` das aulas 04 a 10 foram removidas (continuam no histórico do git).
+- [ ] `Aula08.Web.Tests` ainda não está em `Aula01DotNet.sln` (já está no git).
 - [ ] Aviso MSB3277 nos testes: alinhar a versão do `Microsoft.EntityFrameworkCore.InMemory` com a do projeto web.
 - [ ] Decidir se `Aula07.Web/run.log`, `Backups-Supabase/` e `GUIA-FORMATACAO.md` (já estavam não rastreados) entram no git ou no `.gitignore`.
 
