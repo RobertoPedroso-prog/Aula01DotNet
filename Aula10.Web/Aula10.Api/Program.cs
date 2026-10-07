@@ -1,3 +1,4 @@
+using Hipermidia.Data;
 using Aula10.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,10 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var connString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Host=localhost:54322;Database=postgres;Username=postgres;Password=postgres;SearchPath=aula10";
+    ?? "Host=localhost:54322;Database=postgres;Username=postgres;Password=postgres";
+
+// Schema "hipermidia" (migrations ficam em Hipermidia.Data)
+HipermidiaMigrator.Aplicar(connString);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connString));
@@ -30,7 +34,6 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        context.Database.Migrate();
         DbInitializer.Initialize(context);
     }
 }

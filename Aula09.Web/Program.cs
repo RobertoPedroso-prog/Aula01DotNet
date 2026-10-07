@@ -1,6 +1,7 @@
 using Aula09.Web;
 using Aula09.Web.Data;
 using Aula09.Web.Services;
+using Hipermidia.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,11 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// DbContext com PostgreSQL e schema 'aula09'
+// DbContext com PostgreSQL e schema 'hipermidia' (compartilhado por todas as aulas)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddPooledDbContextFactory<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
-// ProdutoService
+// ProdutoService + notificador de alterações (singleton, compartilhado entre circuitos)
+builder.Services.AddSingleton<ProdutoEventos>();
 builder.Services.AddScoped<ProdutoService>();
 
 // TemaService
@@ -21,10 +24,10 @@ builder.Services.AddScoped<TemaService>();
 
 var app = builder.Build();
 
-// Migrations automáticas e Seed no startup
+// Schema 'hipermidia' (migrations em Hipermidia.Data) e Seed no startup
+HipermidiaMigrator.Aplicar(connectionString);
 using (var context = app.Services.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext())
 {
-    context.Database.Migrate();
     DbInitializer.Seed(context);
 }
 

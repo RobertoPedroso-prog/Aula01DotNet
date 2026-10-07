@@ -11,7 +11,7 @@
 - Aplicar padrões avançados de comunicação entre componentes
 
 **Decisões confirmadas com usuário**:
-- **Persistência**: reutilizar EF Core + PostgreSQL com schema próprio `aula09`
+- **Persistência**: reutilizar EF Core + PostgreSQL com schema compartilhado `hipermidia` (todas as aulas)
 - **Base**: portar models `Produto`/`Categoria` de `Aula08.Web`
 - **Autenticação**: não incluir (fora do escopo)
 - **Componente Card**: usar `RenderFragment` para flexibilidade máxima
@@ -33,7 +33,7 @@ Aula09.Web/
 │   └── Categoria.cs
 │
 ├── Data/ (portado de Aula08)
-│   ├── AppDbContext.cs (schema 'aula09')
+│   ├── AppDbContext.cs (schema 'hipermidia')
 │   └── DbInitializer.cs
 │
 ├── Services/
@@ -53,7 +53,7 @@ Aula09.Web/
 │   └── TemaService.cs (Scoped, armazena preferência dark/light)
 │
 ├── Program.cs (DbContextFactory + TemaService)
-├── appsettings.json (connection string aula09)
+├── appsettings.json (connection string (schema hipermidia))
 ├── App.razor / Routes.razor / _Imports.razor (estrutura Blazor)
 └── PLANO.md
 ```
@@ -178,7 +178,7 @@ Documentar conforme padrão (Aula07/Aula08):
 ## Verificação
 
 1. **Compilação**: `dotnet build`
-2. **Migrations**: `dotnet ef database update --project Aula09.Web` (confirmar schema `aula09`)
+2. **Migrations**: `dotnet ef database update --project Aula09.Web` (as migrations ficam em `Hipermidia.Data`; schema `hipermidia`)
 3. **Execução**: `dotnet run --project Aula09.Web`, acessar `http://localhost:5238`
 4. **Testes Manuais**:
    - Dashboard carrega com totais corretos
@@ -187,3 +187,33 @@ Documentar conforme padrão (Aula07/Aula08):
    - Após cadastro, dashboard atualiza em tempo real
    - Trocar tema (dark/light) afeta toda a aplicação
    - Formulário rejeita preço < mínimo por categoria
+
+---
+
+## 13. Conformidade com o PDF (Resultado Esperado e Atividade Avaliativa)
+
+Revisão feita contra `Aula_09.pdf`. Resultado esperado: componentes reutilizáveis, validação customizada, formulários complexos, dashboard interativo e base sólida para Blazor WASM.
+
+| # | Atividade avaliativa | Onde está | Situação |
+|---|----------------------|-----------|----------|
+| 1 | `Card` com ícone dinâmico | `Components/Card.razor` (parâmetro `Icone`, classes Bootstrap Icons; CSS `bootstrap-icons` carregado em `App.razor`) | Atendido |
+| 2 | Validação de preço mínimo por categoria | `ProdutoFormAvancado.razor` → `ValidacaoCustomizada` (Eletrônicos R$ 100, demais R$ 10) com `ValidationMessageStore` | Atendido |
+| 3 | Dashboard atualizado em tempo real após cadastro | `ProdutoEventos` (singleton) é notificado por `ProdutoService` em Adicionar/Atualizar/Remover; `DashboardResumo.razor` assina o evento e recarrega. Usado em `/dashboard` e no topo de `/produtos` | Atendido |
+| 4 | `CascadingParameter` para o tema (dark/light) | `MainLayout.razor` publica `<CascadingValue Name="Tema">` e aplica `data-bs-theme`; `Configuracoes.razor` recebe com `[CascadingParameter(Name = "Tema")]`. O tema é salvo em `hipermidia."Configuracoes"` e sobrevive ao recarregar | Atendido |
+
+Ajustes adicionais feitos nesta revisão:
+- `@rendermode InteractiveServer` em `App.razor` (sem ele as páginas eram SSR estático e o POST do formulário falhava).
+- Edição de produto (botão **Editar**, `ProdutoFormAvancado` em modo edição) e validação da categoria obrigatória (`[Range(1, int.MaxValue)]`).
+- `/produtos` passou a usar `ProdutoFormAvancado` (com Estoque) em vez de `ProdutoForm`.
+- Rodapé corrigido para "Aula 09".
+
+## 14. Schema único `hipermidia`
+
+Todas as aulas (04 a 10) usam o schema `hipermidia`, com tabelas compartilhadas:
+`Categorias`, `Produtos` (Nome, Preco, Ativo, Estoque, Imagem, CategoriaId), `Pedidos` + `PedidoProduto` (Aula04), tabelas do Identity `AspNet*` (Aula07) e `Configuracoes` (chave/valor; guarda o tema).
+
+- O modelo e as migrations ficam em `Hipermidia.Data` (`HipermidiaDbContext`, `HipermidiaMigrator.Aplicar`). Cada aula chama `HipermidiaMigrator.Aplicar(connectionString)` no startup e só mapeia as tabelas que usa; as pastas `Migrations` das aulas foram removidas.
+- Colunas que uma aula não conhece têm default no banco (`Ativo = true`, `Estoque = 0`, `Imagem` nula), então todas inserem normalmente.
+- O histórico de migrations fica em `hipermidia."__EFMigrationsHistory"`.
+- Nova migration: `dotnet ef migrations add <Nome> --context HipermidiaDbContext --project Hipermidia.Data --startup-project Aula09.Web` (definir antes a variável `HIPERMIDIA_CONNECTION`).
+- Os dados do antigo schema `aula08` (2 categorias, 8 produtos) foram copiados para `hipermidia` com os mesmos Ids.

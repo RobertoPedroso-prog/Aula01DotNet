@@ -16,7 +16,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("aula04");
+        modelBuilder.HasDefaultSchema("hipermidia");
 
         // Configuração de relacionamento 1:N
         modelBuilder.Entity<Categoria>()

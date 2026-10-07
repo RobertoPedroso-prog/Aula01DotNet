@@ -13,32 +13,23 @@
             <label class="form-label">Tema</label>
             <div class="btn-group" role="group">
                 <button type="button"
-                        class="btn @(TemaService.Tema == "light" ? "btn-primary" : "btn-outline-primary")"
-                        @onclick="AlterarParaLight">
+                        class="btn @(Tema == "light" ? "btn-primary" : "btn-outline-primary")"
+                        @onclick='() => TemaService.AlterarTemaAsync("light")'>
                     ☀️ Claro
                 </button>
                 <button type="button"
-                        class="btn @(TemaService.Tema == "dark" ? "btn-primary" : "btn-outline-primary")"
-                        @onclick="AlterarParaDark">
+                        class="btn @(Tema == "dark" ? "btn-primary" : "btn-outline-primary")"
+                        @onclick='() => TemaService.AlterarTemaAsync("dark")'>
                     🌙 Escuro
                 </button>
             </div>
         </div>
-        <p class="text-muted">Tema atual: <strong>@(TemaService.Tema == "light" ? "Claro" : "Escuro")</strong></p>
+        <p class="text-muted">Tema atual: <strong>@(Tema == "light" ? "Claro" : "Escuro")</strong></p>
     </div>
 </div>
 
 @code {
-    protected override void OnInitialized()
-    {
-        TemaService.OnTemaChanged += StateHasChanged;
-    }
-
-    private void AlterarParaLight() => TemaService.AlterarTema("light");
-    private void AlterarParaDark() => TemaService.AlterarTema("dark");
-
-    public void Dispose()
-    {
-        TemaService.OnTemaChanged -= StateHasChanged;
-    }
+    // Recebido do MainLayout via CascadingValue: reflete o tema sem a página assinar eventos
+    [CascadingParameter(Name = "Tema")]
+    public string Tema { get; set; } = "light";
 }

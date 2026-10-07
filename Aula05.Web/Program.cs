@@ -1,3 +1,4 @@
+using Hipermidia.Data;
 using System.Globalization;
 using Aula05.Web.Data;
 using Aula05.Web.Filters;
@@ -21,10 +22,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+// Schema "hipermidia" (migrations ficam em Hipermidia.Data)
+HipermidiaMigrator.Aplicar(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
     DbInitializer.Seed(context);
 }
 

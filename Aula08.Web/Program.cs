@@ -1,3 +1,4 @@
+using Hipermidia.Data;
 using Aula08.Web;
 using Aula08.Web.Data;
 using Aula08.Web.Services;
@@ -19,9 +20,11 @@ builder.Services.AddScoped<ProdutoService>();
 var app = builder.Build();
 
 // Migrations automáticas e Seed no startup
+// Schema "hipermidia" (migrations ficam em Hipermidia.Data)
+HipermidiaMigrator.Aplicar(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 using (var context = app.Services.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext())
 {
-    context.Database.Migrate();
     DbInitializer.Seed(context);
 }
 

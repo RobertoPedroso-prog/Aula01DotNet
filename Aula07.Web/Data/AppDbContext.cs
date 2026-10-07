@@ -16,7 +16,7 @@ public class AppDbContext : IdentityDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("aula07");
+        modelBuilder.HasDefaultSchema("hipermidia");
 
         modelBuilder.Entity<Categoria>()
             .HasMany(c => c.Produtos)

@@ -1,0 +1,81 @@
+@using Aula09.Web.Models
+@using Aula09.Web.Services
+@implements IDisposable
+@inject ProdutoService ProdutoService
+@inject ProdutoEventos Eventos
+
+<div class="dashboard">
+    <Card Titulo="Total de Produtos" Icone="bi bi-box">
+        <h2>@TotalProdutos</h2>
+        <p class="text-muted">Produtos cadastrados</p>
+    </Card>
+
+    <Card Titulo="Preço Médio" Icone="bi bi-tag">
+        <h2>@PrecoMedio.ToString("C")</h2>
+        <p class="text-muted">Valor médio dos produtos</p>
+    </Card>
+
+    <Card Titulo="Total em Estoque" Icone="bi bi-basket">
+        <h2>@TotalEstoque</h2>
+        <p class="text-muted">Unidades disponíveis</p>
+    </Card>
+
+    <Card Titulo="Categoria com Mais Produtos" Icone="bi bi-list-ul">
+        <h2>@(CategoriaComMais ?? "-")</h2>
+        <p class="text-muted">@QtdCategoriaComMais produtos</p>
+    </Card>
+</div>
+
+<style>
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+
+@code {
+    private int TotalProdutos;
+    private decimal PrecoMedio;
+    private int TotalEstoque;
+    private string? CategoriaComMais;
+    private int QtdCategoriaComMais;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Eventos.OnProdutosAlterados += AoAlterarProdutos;
+        await CarregarDados();
+    }
+
+    private void AoAlterarProdutos()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await CarregarDados();
+            StateHasChanged();
+        });
+    }
+
+    private async Task CarregarDados()
+    {
+        var produtos = await ProdutoService.ObterTodosAsync();
+
+        TotalProdutos = produtos.Count;
+        PrecoMedio = produtos.Count > 0 ? produtos.Average(p => p.Preco) : 0;
+        TotalEstoque = produtos.Sum(p => p.Estoque);
+
+        var maior = produtos
+            .GroupBy(p => p.Categoria?.Nome)
+            .OrderByDescending(g => g.Count())
+            .FirstOrDefault();
+
+        CategoriaComMais = maior?.Key;
+        QtdCategoriaComMais = maior?.Count() ?? 0;
+    }
+
+    public void Dispose()
+    {
+        Eventos.OnProdutosAlterados -= AoAlterarProdutos;
+    }
+}

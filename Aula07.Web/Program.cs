@@ -1,3 +1,4 @@
+using Hipermidia.Data;
 using System.Globalization;
 using Aula07.Web.Data;
 using Aula07.Web.Filters;
@@ -54,10 +55,12 @@ builder.Services.AddSession();
 var app = builder.Build();
 
 // Migrations automáticas e Seed no startup
+// Schema "hipermidia" (migrations ficam em Hipermidia.Data)
+HipermidiaMigrator.Aplicar(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
     DbInitializer.Seed(context);
     await IdentitySeeder.SeedAsync(scope.ServiceProvider);
 }

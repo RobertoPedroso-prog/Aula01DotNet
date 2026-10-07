@@ -7,10 +7,12 @@ namespace Aula09.Web.Services;
 public class ProdutoService
 {
     private readonly IDbContextFactory<AppDbContext> _factory;
+    private readonly ProdutoEventos _eventos;
 
-    public ProdutoService(IDbContextFactory<AppDbContext> factory)
+    public ProdutoService(IDbContextFactory<AppDbContext> factory, ProdutoEventos eventos)
     {
         _factory = factory;
+        _eventos = eventos;
     }
 
     public async Task<List<Produto>> ObterTodosAsync()
@@ -36,6 +38,7 @@ public class ProdutoService
         using var context = _factory.CreateDbContext();
         context.Produtos.Add(produto);
         await context.SaveChangesAsync();
+        _eventos.Notificar();
     }
 
     public async Task AtualizarAsync(Produto produto)
@@ -43,6 +46,7 @@ public class ProdutoService
         using var context = _factory.CreateDbContext();
         context.Produtos.Update(produto);
         await context.SaveChangesAsync();
+        _eventos.Notificar();
     }
 
     public async Task RemoverAsync(int id)
@@ -53,6 +57,7 @@ public class ProdutoService
         {
             context.Produtos.Remove(produto);
             await context.SaveChangesAsync();
+            _eventos.Notificar();
         }
     }
 }

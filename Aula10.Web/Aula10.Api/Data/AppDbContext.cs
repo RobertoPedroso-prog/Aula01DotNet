@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("hipermidia");
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Categoria>(entity =>

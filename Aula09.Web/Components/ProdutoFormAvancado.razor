@@ -5,7 +5,7 @@
 
 <div class="card mb-4">
     <div class="card-header">
-        <h4>Novo Produto</h4>
+        <h4>@(EmEdicao ? "Editar Produto" : "Novo Produto")</h4>
     </div>
     <div class="card-body">
         <EditForm EditContext="editContext" OnValidSubmit="Salvar">
@@ -30,7 +30,7 @@
             <div class="mb-3">
                 <label for="categoria" class="form-label">Categoria</label>
                 <InputSelect id="categoria" class="form-control" @bind-Value="Produto.CategoriaId">
-                    <option value="">Selecione uma categoria</option>
+                    <option value="0">Selecione uma categoria</option>
                     @foreach (var cat in Categorias)
                     {
                         <option value="@cat.Id">@cat.Nome</option>
@@ -45,7 +45,11 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="submit" class="btn btn-primary">@(EmEdicao ? "Atualizar" : "Salvar")</button>
+            @if (EmEdicao)
+            {
+                <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+            }
         </EditForm>
     </div>
 </div>
@@ -55,13 +59,47 @@
     private EditContext editContext;
     private ValidationMessageStore messages;
     private List<Categoria> Categorias = [];
+    private Produto? _ultimoEmEdicao;
+
+    private bool EmEdicao => Produto.Id > 0;
 
     [Parameter]
     public EventCallback<Produto> OnSalvar { get; set; }
 
+    [Parameter]
+    public Produto? ProdutoEmEdicao { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelarEdicao { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        IniciarContexto(Produto);
         Categorias = await ProdutoService.ObterCategoriasAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (editContext is null || ReferenceEquals(ProdutoEmEdicao, _ultimoEmEdicao))
+            return;
+
+        _ultimoEmEdicao = ProdutoEmEdicao;
+        IniciarContexto(ProdutoEmEdicao is null
+            ? new() { Nome = string.Empty }
+            : new()
+            {
+                Id = ProdutoEmEdicao.Id,
+                Nome = ProdutoEmEdicao.Nome,
+                Preco = ProdutoEmEdicao.Preco,
+                Estoque = ProdutoEmEdicao.Estoque,
+                Ativo = ProdutoEmEdicao.Ativo,
+                CategoriaId = ProdutoEmEdicao.CategoriaId
+            });
+    }
+
+    private void IniciarContexto(Produto produto)
+    {
+        Produto = produto;
         editContext = new EditContext(Produto);
         messages = new ValidationMessageStore(editContext);
         editContext.OnValidationRequested += ValidacaoCustomizada;
@@ -95,10 +133,13 @@
         if (editContext.Validate())
         {
             await OnSalvar.InvokeAsync(Produto);
-            Produto = new() { Nome = string.Empty };
-            editContext = new EditContext(Produto);
-            messages = new ValidationMessageStore(editContext);
-            editContext.OnValidationRequested += ValidacaoCustomizada;
+            IniciarContexto(new() { Nome = string.Empty });
         }
+    }
+
+    private async Task Cancelar()
+    {
+        IniciarContexto(new() { Nome = string.Empty });
+        await OnCancelarEdicao.InvokeAsync();
     }
 }

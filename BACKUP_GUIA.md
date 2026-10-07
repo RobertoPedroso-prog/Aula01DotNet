@@ -76,7 +76,7 @@ psql -h localhost -p 54322 -U postgres -d postgres -f aula07_backup_2025-01-15_1
 ## 📋 ESTRUTURA DO BACKUP
 
 Os scripts fazem backup completo incluindo:
-- ✅ Esquema (schema `aula07`)
+- ✅ Esquema (schema `hipermidia`, compartilhado por todas as aulas)
 - ✅ Tabelas (Produtos, Categorias, AspNetUsers, etc)
 - ✅ Dados (todos os registros)
 - ✅ Índices
@@ -154,7 +154,7 @@ psql -h localhost -p 54322 -U postgres -d postgres
 
 Executar query SQL:
 ```bash
-psql -h localhost -p 54322 -U postgres -d postgres -c "SELECT COUNT(*) FROM aula07.\"Produtos\";"
+psql -h localhost -p 54322 -U postgres -d postgres -c "SELECT COUNT(*) FROM hipermidia.\"Produtos\";"
 ```
 
 Tamanho do backup:

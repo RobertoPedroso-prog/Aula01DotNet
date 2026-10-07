@@ -1,6 +1,10 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@using Aula09.Web.Services
+@inject TemaService TemaService
 
-<div class="page">
+<CascadingValue Value="TemaService.Tema" Name="Tema">
+<div class="page" data-bs-theme="@TemaService.Tema">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">Aula09.Web</a>
@@ -27,11 +31,27 @@
         @Body
     </main>
 
-    <footer class="footer mt-5 py-3 bg-light">
+    <footer class="footer mt-5 py-3 bg-body-secondary">
         <div class="container text-center">
-            <span class="text-muted">Aula 08 - Blazor Server &copy; 2026</span>
+            <span class="text-muted">Aula 09 - Blazor Server &copy; 2026</span>
         </div>
     </footer>
 </div>
+</CascadingValue>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        TemaService.OnTemaChanged += AoMudarTema;
+        await TemaService.CarregarAsync();
+    }
+
+    private void AoMudarTema() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        TemaService.OnTemaChanged -= AoMudarTema;
+    }
+}

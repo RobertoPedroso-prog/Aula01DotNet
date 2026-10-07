@@ -6,9 +6,13 @@
 <div class="container mt-5">
     <h1>Gerenciamento de Produtos (Blazor Server)</h1>
 
+    <div class="mt-4">
+        <DashboardResumo />
+    </div>
+
     <div class="row mt-4">
         <div class="col-md-6">
-            <ProdutoForm OnSalvar="AdicionarProduto" />
+            <ProdutoFormAvancado OnSalvar="SalvarProduto" ProdutoEmEdicao="ProdutoEmEdicao" OnCancelarEdicao="CancelarEdicao" />
         </div>
         <div class="col-md-6">
             <CascadingValue Value="ProdutoSelecionado">
@@ -19,7 +23,7 @@
 
     <div class="row mt-4">
         <div class="col-12">
-            <ProdutoList Produtos="ListaProdutos" OnSelecionar="SelecionarProduto" OnExcluirSolicitado="SolicitarExclusao" />
+            <ProdutoList Produtos="ListaProdutos" OnSelecionar="SelecionarProduto" OnEditar="IniciarEdicao"OnExcluirSolicitado="SolicitarExclusao" />
         </div>
     </div>
 
@@ -33,6 +37,7 @@
 @code {
     private List<Produto> ListaProdutos = [];
     private Produto? ProdutoSelecionado;
+    private Produto? ProdutoEmEdicao;
     private int? IdParaExcluir;
 
     protected override async Task OnInitializedAsync()
@@ -45,14 +50,29 @@
         ListaProdutos = await ProdutoService.ObterTodosAsync();
     }
 
-    private async Task AdicionarProduto(Produto produto)
+    private async Task SalvarProduto(Produto produto)
     {
-        if (produto.CategoriaId > 0)
-        {
+        if (produto.CategoriaId <= 0)
+            return;
+
+        if (produto.Id > 0)
+            await ProdutoService.AtualizarAsync(produto);
+        else
             await ProdutoService.AdicionarAsync(produto);
-            await CarregarProdutos();
-            ProdutoSelecionado = null;
-        }
+
+        await CarregarProdutos();
+        ProdutoSelecionado = null;
+        ProdutoEmEdicao = null;
+    }
+
+    private async Task IniciarEdicao(int id)
+    {
+        ProdutoEmEdicao = await ProdutoService.ObterPorIdAsync(id);
+    }
+
+    private void CancelarEdicao()
+    {
+        ProdutoEmEdicao = null;
     }
 
     private async Task SelecionarProduto(int id)
@@ -72,6 +92,8 @@
             await ProdutoService.RemoverAsync(IdParaExcluir.Value);
             await CarregarProdutos();
             ProdutoSelecionado = null;
+            if (ProdutoEmEdicao?.Id == IdParaExcluir)
+                ProdutoEmEdicao = null;
             IdParaExcluir = null;
         }
     }
