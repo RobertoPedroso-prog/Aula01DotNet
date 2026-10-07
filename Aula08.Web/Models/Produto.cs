@@ -16,7 +16,7 @@ public class Produto
 
     public bool Ativo { get; set; }
 
-    [Required(ErrorMessage = "A categoria é obrigatória")]
+    [Range(1, int.MaxValue, ErrorMessage = "A categoria é obrigatória")]
     public int CategoriaId { get; set; }
 
     public Categoria? Categoria { get; set; }

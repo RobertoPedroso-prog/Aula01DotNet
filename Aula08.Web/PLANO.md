@@ -127,8 +127,8 @@ Reescrever conforme o slide, mas com `AppDbContext` injetado e métodos assíncr
 - `async Task RemoverAsync(int id)`
 
 ### Passo 6: Componentes Reutilizáveis
-1. **`ProdutoForm.razor`**: `EditForm` com validação; dispara `EventCallback<Produto> OnSalvar`.
-2. **`ProdutoList.razor`**: Tabela de produtos; dispara `EventCallback<int> OnSelecionar` e `EventCallback<int> OnExcluirSolicitado`.
+1. **`ProdutoForm.razor`**: `EditForm` com validação; serve para criar e editar (parâmetro `ProdutoEmEdicao`, título/botões mudam em modo edição); dispara `EventCallback<Produto> OnSalvar` e `OnCancelarEdicao`. A página decide entre `AdicionarAsync` e `AtualizarAsync` pelo `Id`.
+2. **`ProdutoList.razor`**: Tabela de produtos; dispara `EventCallback<int> OnSelecionar`, `OnEditar` e `OnExcluirSolicitado`.
 3. **`ProdutoDetalhe.razor`** *(Desafio 1)*: Exibe detalhes do produto selecionado via **`[CascadingParameter] Produto? ProdutoSelecionado`** *(Desafio 2)*.
 4. **`ConfirmarExclusao.razor`** *(Desafio 3)*: Componente de confirmação inline (não JS alert) com `EventCallback OnConfirmar` / `OnCancelar`.
 
@@ -199,8 +199,6 @@ Reescrever conforme o slide, mas com `AppDbContext` injetado e métodos assíncr
 
 - Adicionar autenticação Identity (login/roles).
 - Upload de imagem de produto.
-- Edição de produtos (Edit page).
 - Paginação de listagem.
 - Busca/filtro por nome ou categoria.
 - Gráficos de preço usando Blazor + library de charting.
-- Testes unitários para `ProdutoService`.

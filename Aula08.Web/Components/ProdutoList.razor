@@ -42,6 +42,9 @@
                                 <button class="btn btn-sm btn-info" @onclick="() => OnSelecionar.InvokeAsync(produto.Id)">
                                     Detalhes
                                 </button>
+                                <button class="btn btn-sm btn-warning" @onclick="() => OnEditar.InvokeAsync(produto.Id)">
+                                    Editar
+                                </button>
                                 <button class="btn btn-sm btn-danger" @onclick="() => OnExcluirSolicitado.InvokeAsync(produto.Id)">
                                     Excluir
                                 </button>
@@ -60,6 +63,9 @@
 
     [Parameter]
     public EventCallback<int> OnSelecionar { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnEditar { get; set; }
 
     [Parameter]
     public EventCallback<int> OnExcluirSolicitado { get; set; }
