@@ -1,0 +1,289 @@
+@page "/produtos"
+@using Aula11.BlazorWasm.Models
+@using Aula11.BlazorWasm.Services
+@inject ProdutosApiClient Api
+
+<PageTitle>Produtos</PageTitle>
+
+<header class="page-header">
+    <h1>Produtos</h1>
+    <p class="text-secondary mb-0">
+        Lendo de <code>/api/@versao/produtos</code> com filtros e paginação.
+    </p>
+</header>
+
+<section class="card mb-4" aria-label="Filtros">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="versao">Versão da API</label>
+                <select id="versao" class="form-select" @bind="versao" @bind:after="Buscar">
+                    <option value="v1">v1 (Id, Nome, Preço)</option>
+                    <option value="v2">v2 (+ Ativo, Estoque, Categoria)</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="filtroNome">Nome</label>
+                <input id="filtroNome" class="form-control" placeholder="Filtrar por nome" @bind="filtroNome" @bind:event="oninput"
+                       @onkeydown="AoDigitar" />
+            </div>
+            <div class="col-6 col-lg-2">
+                <label class="form-label" for="filtroStatus">Status</label>
+                <select id="filtroStatus" class="form-select" @bind="filtroStatus" @bind:after="Buscar">
+                    <option value="">Todos</option>
+                    <option value="true">Ativos</option>
+                    <option value="false">Inativos</option>
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label class="form-label" for="tamanho">Por página</label>
+                <select id="tamanho" class="form-select" @bind="pageSize" @bind:after="Buscar">
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+            <div class="col-12 col-lg-2">
+                <button class="btn btn-primary w-100" @onclick="Buscar" disabled="@carregando">Buscar</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="card mb-4" aria-label="Lista de produtos">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Lista de produtos</span>
+        @if (carregando)
+        {
+            <span class="spinner-border spinner-border-sm text-secondary" role="status" aria-label="Carregando"></span>
+        }
+    </div>
+
+    @if (carregando && resultado == null)
+    {
+        <div class="card-body d-flex align-items-center" role="status">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <span>Carregando produtos...</span>
+        </div>
+    }
+    else if (erroLista is not null)
+    {
+        <div class="card-body">
+            <div class="alert alert-danger mb-0" role="alert">
+                <p class="mb-2">@erroLista</p>
+                <button class="btn btn-sm btn-danger" @onclick="Carregar">Tentar novamente</button>
+            </div>
+        </div>
+    }
+    else if (resultado != null)
+    {
+        @if (!resultado.Items.Any())
+        {
+            <div class="card-body">
+                <div class="alert alert-info mb-0">Nenhum produto encontrado com esses filtros.</div>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nome</th>
+                            <th class="text-end">Preço</th>
+                            @if (versao == "v2")
+                            {
+                                <th>Ativo</th>
+                                <th class="text-end">Estoque</th>
+                                <th>Categoria</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in resultado.Items)
+                        {
+                            <tr>
+                                <td>@p.Id</td>
+                                <td>@p.Nome</td>
+                                <td class="text-end">@p.Preco.ToString("C")</td>
+                                @if (versao == "v2")
+                                {
+                                    <td>
+                                        @if (p.Ativo == true)
+                                        {
+                                            <span class="badge text-bg-success">Ativo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge text-bg-secondary">Inativo</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">@p.Estoque</td>
+                                    <td>@p.Categoria</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="card-footer">
+            <div class="paginacao">
+                <button class="btn btn-outline-secondary btn-sm" @onclick="Anterior" disabled="@(carregando || pagina <= 1)">Anterior</button>
+                <span class="resumo">Página @pagina de @TotalPaginas (@resultado.TotalItems produtos)</span>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="Proxima" disabled="@(carregando || pagina >= TotalPaginas)">Próxima</button>
+            </div>
+        </div>
+    }
+</section>
+
+<section class="card" aria-label="Criar produto">
+    <div class="card-header">
+        Novo produto <code class="ms-1">POST /api/@versao/produtos</code>
+    </div>
+    <div class="card-body">
+        <EditForm Model="novo" OnValidSubmit="Criar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Nome</label>
+                    <InputText class="form-control" @bind-Value="novo.Nome" placeholder="Ex: Monitor 24&quot;" />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Preço (R$)</label>
+                    <InputNumber class="form-control" @bind-Value="novo.Preco" step="0.01" />
+                </div>
+                @if (versao == "v2")
+                {
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Estoque</label>
+                        <InputNumber class="form-control" @bind-Value="novo.Estoque" />
+                    </div>
+                    <div class="col-6 col-md-1 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <InputCheckbox id="ativo" class="form-check-input" @bind-Value="novo.Ativo" />
+                            <label for="ativo" class="form-check-label">Ativo</label>
+                        </div>
+                    </div>
+                }
+                <div class="col-6 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100" disabled="@salvando">
+                        @if (salvando)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span>Salvando...</span>
+                        }
+                        else
+                        {
+                            <span>Criar</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(erroCriar))
+        {
+            <div class="alert alert-danger mt-3 mb-0" role="alert">@erroCriar</div>
+        }
+        @if (!string.IsNullOrEmpty(sucessoCriar))
+        {
+            <div class="alert alert-success mt-3 mb-0" role="status">@sucessoCriar</div>
+        }
+    </div>
+</section>
+
+@code {
+    private string versao = "v1";
+    private string? filtroNome;
+    private string filtroStatus = string.Empty;
+    private int pageSize = 2;
+    private int pagina = 1;
+
+    private PagedResult<ProdutoDto>? resultado;
+    private bool carregando;
+    private string? erroLista;
+
+    private CriarProdutoRequest novo = new();
+    private bool salvando;
+    private string? erroCriar;
+    private string? sucessoCriar;
+
+    private int TotalPaginas => Math.Max(1, resultado?.TotalPages ?? 1);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Carregar();
+    }
+
+    // Mudou filtro, versão ou tamanho de página: volta para a primeira página
+    private async Task Buscar()
+    {
+        pagina = 1;
+        await Carregar();
+    }
+
+    private async Task AoDigitar(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await Buscar();
+    }
+
+    private async Task Anterior()
+    {
+        pagina--;
+        await Carregar();
+    }
+
+    private async Task Proxima()
+    {
+        pagina++;
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        carregando = true;
+        erroLista = null;
+
+        bool? ativo = filtroStatus switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null
+        };
+
+        var resposta = await Api.ListarAsync(versao, pagina, pageSize, filtroNome, ativo);
+        if (resposta.Sucesso)
+            resultado = resposta.Valor;
+        else
+            erroLista = resposta.Erro;
+
+        carregando = false;
+    }
+
+    private async Task Criar()
+    {
+        salvando = true;
+        erroCriar = null;
+        sucessoCriar = null;
+
+        var resposta = await Api.CriarAsync(versao, novo);
+        if (resposta.Sucesso)
+        {
+            sucessoCriar = $"Produto \"{resposta.Valor!.Nome}\" criado com sucesso (id {resposta.Valor.Id}).";
+            novo = new();
+            await Carregar();
+        }
+        else
+        {
+            erroCriar = resposta.Erro;
+        }
+
+        salvando = false;
+    }
+}

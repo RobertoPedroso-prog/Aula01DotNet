@@ -1,0 +1,30 @@
+<header class="app-header">
+    <nav class="container app-nav" aria-label="Principal">
+        <a class="app-brand" href="" aria-label="Aula 11, página inicial">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6z" />
+            </svg>
+            <span>Aula 11 <small>Web API</small></span>
+        </a>
+
+        <button type="button" class="app-nav-toggle" aria-label="Abrir ou fechar o menu"
+                aria-expanded="@((!recolhido).ToString().ToLowerInvariant())" @onclick="Alternar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+            </svg>
+        </button>
+
+        <ul class="app-nav-links @(recolhido ? null : "aberto")" @onclick="Fechar">
+            <li><NavLink class="app-nav-link" href="" Match="NavLinkMatch.All">Início</NavLink></li>
+            <li><NavLink class="app-nav-link" href="produtos">Produtos</NavLink></li>
+        </ul>
+    </nav>
+</header>
+
+@code {
+    private bool recolhido = true;
+
+    private void Alternar() => recolhido = !recolhido;
+
+    private void Fechar() => recolhido = true;
+}
