@@ -1,11 +1,11 @@
 {
-  "name": "Aula10.BlazorWasm",
-  "short_name": "Aula10.BlazorWasm",
+  "name": "Aula 10 - Blazor WebAssembly",
+  "short_name": "Aula 10",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "background_color": "#f8f9fa",
+  "theme_color": "#0f172a",
   "prefer_related_applications": false,
   "icons": [
     {

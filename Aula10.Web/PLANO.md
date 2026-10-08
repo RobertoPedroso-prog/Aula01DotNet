@@ -326,3 +326,14 @@ No primeiro acesso o WASM leva alguns segundos para baixar o runtime.
 
 - O service worker de desenvolvimento (`service-worker.js`) não faz cache; o modo offline completo só existe no build publicado (`service-worker.published.js`).
 - A API não tem autenticação; JWT fica como evolução (o PDF cita como próxima base).
+
+## Refatoração de layout e CSS (2026-10-08)
+
+O visual herdado do template (menu lateral roxo, estilos soltos) foi substituído pelo mesmo padrão da Aula 11 (`Aula11.Web`):
+
+- **Layout**: `MainLayout` com barra superior fixa (`NavMenu`: Início, Produtos, Counter, Weather), conteúdo em `container` e rodapé; menu recolhível no celular (botão ☰ com `aria-expanded`). Sidebar e ícones em CSS saíram.
+- **CSS**: `wwwroot/css/app.css` com variáveis (`--app-primary`, `--app-radius`, `--app-shadow`) e cores do Bootstrap 5.3; **tema claro/escuro acompanha o sistema** (script em `index.html` define `data-bs-theme`). Cartões, tabelas, formulários, validação e tela de carregamento usam esses tokens.
+- **Telas**: Início com cartões (client-side, consumo de API, PWA/offline); Produtos em dois cartões (novo produto e lista com Atualizar, estados de carregamento/erro e o aviso de cache offline); Counter e Weather (exemplos do template) em cartões e em português; "não encontrada" em português.
+- **Lógica intacta**: o `@code` de `Produtos.razor` (cache em `localStorage`, tratamento de erros, POST) não mudou.
+- **PWA**: `manifest.webmanifest` e `index.html` atualizados; `dotnet publish -c Release` continua gerando o app com service worker.
+- **Verificado**: tema escuro e claro, todas as páginas, validação, aviso offline com a API desligada, menu no celular (390 px) e publish em Release.

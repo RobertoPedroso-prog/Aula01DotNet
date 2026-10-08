@@ -1,12 +1,18 @@
-﻿@page "/counter"
+@page "/counter"
 
 <PageTitle>Counter</PageTitle>
 
-<h1>Counter</h1>
+<header class="page-header">
+    <h1>Counter</h1>
+    <p class="text-secondary mb-0">Exemplo do template: o estado fica no navegador.</p>
+</header>
 
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<div class="card" style="max-width: 24rem;">
+    <div class="card-body d-flex align-items-center justify-content-between">
+        <p role="status" class="mb-0">Contagem atual: <strong>@currentCount</strong></p>
+        <button class="btn btn-primary" @onclick="IncrementCount">Clique aqui</button>
+    </div>
+</div>
 
 @code {
     private int currentCount = 0;

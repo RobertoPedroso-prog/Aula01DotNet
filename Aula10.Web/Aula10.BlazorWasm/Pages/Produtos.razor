@@ -6,52 +6,61 @@
 
 <PageTitle>Produtos</PageTitle>
 
-<div class="container mt-4">
+<header class="page-header">
     <h1>Produtos</h1>
+    <p class="text-secondary mb-0">
+        Lista e cadastro pela API (<code>/api/produtos</code>), com cache offline da última lista.
+    </p>
+</header>
 
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h5>Criar Novo Produto</h5>
-            <EditForm Model="novoProduto" OnValidSubmit="CriarProduto">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+<div class="row g-4">
+    <div class="col-lg-5">
+        <section class="card" aria-label="Criar produto">
+            <div class="card-header">Novo produto</div>
+            <div class="card-body">
+                <EditForm Model="novoProduto" OnValidSubmit="CriarProduto">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-                <div class="mb-3">
-                    <label class="form-label">Nome</label>
-                    <InputText class="form-control" @bind-Value="novoProduto.Nome" placeholder="Ex: Mouse" />
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <InputText class="form-control" @bind-Value="novoProduto.Nome" placeholder="Ex: Mouse" />
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Preço (R$)</label>
-                    <InputNumber class="form-control" @bind-Value="novoProduto.Preco" step="0.01" />
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">Preço (R$)</label>
+                        <InputNumber class="form-control" @bind-Value="novoProduto.Preco" step="0.01" />
+                    </div>
 
-                <button type="submit" class="btn btn-primary" disabled="@salvando">
-                    @if (salvando)
+                    <button type="submit" class="btn btn-primary" disabled="@salvando">
+                        @if (salvando)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span>Salvando...</span>
+                        }
+                        else
+                        {
+                            <span>Salvar</span>
+                        }
+                    </button>
+
+                    @if (!string.IsNullOrEmpty(erroSalvar))
                     {
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        <span>Salvando...</span>
+                        <div class="alert alert-danger mt-3 mb-0" role="alert">@erroSalvar</div>
                     }
-                    else
+                    @if (!string.IsNullOrEmpty(sucessoSalvar))
                     {
-                        <span>Salvar</span>
+                        <div class="alert alert-success mt-3 mb-0" role="status">@sucessoSalvar</div>
                     }
-                </button>
+                </EditForm>
+            </div>
+        </section>
+    </div>
 
-                @if (!string.IsNullOrEmpty(erroSalvar))
-                {
-                    <div class="alert alert-danger mt-3" role="alert">@erroSalvar</div>
-                }
-                @if (!string.IsNullOrEmpty(sucessoSalvar))
-                {
-                    <div class="alert alert-success mt-3" role="status">@sucessoSalvar</div>
-                }
-            </EditForm>
-        </div>
-
-        <div class="col-md-6">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Lista de Produtos</h5>
+    <div class="col-lg-7">
+        <section class="card" aria-label="Lista de produtos">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Lista de produtos</span>
                 <button class="btn btn-sm btn-outline-secondary" @onclick="CarregarProdutos" disabled="@carregandoLista">
                     Atualizar
                 </button>
@@ -59,55 +68,63 @@
 
             @if (carregandoLista && produtos == null)
             {
-                <div class="d-flex align-items-center mt-3" role="status">
+                <div class="card-body d-flex align-items-center" role="status">
                     <span class="spinner-border spinner-border-sm me-2"></span>
                     <span>Carregando produtos...</span>
                 </div>
             }
             else if (produtos == null)
             {
-                <div class="alert alert-danger mt-3" role="alert">
-                    <p class="mb-2">@erroLista</p>
-                    <button class="btn btn-sm btn-danger" @onclick="CarregarProdutos">Tentar novamente</button>
+                <div class="card-body">
+                    <div class="alert alert-danger mb-0" role="alert">
+                        <p class="mb-2">@erroLista</p>
+                        <button class="btn btn-sm btn-danger" @onclick="CarregarProdutos">Tentar novamente</button>
+                    </div>
                 </div>
             }
             else
             {
                 @if (offline)
                 {
-                    <div class="alert alert-warning mt-3" role="alert">
-                        Sem conexão com a API. Exibindo a última lista salva neste dispositivo
-                        (@(dataCache?.ToString("dd/MM/yyyy HH:mm"))).
-                        <button class="btn btn-sm btn-warning ms-2" @onclick="CarregarProdutos">Tentar novamente</button>
+                    <div class="card-body pb-0">
+                        <div class="alert alert-warning mb-0" role="alert">
+                            Sem conexão com a API. Exibindo a última lista salva neste dispositivo
+                            (@(dataCache?.ToString("dd/MM/yyyy HH:mm"))).
+                            <button class="btn btn-sm btn-warning ms-2" @onclick="CarregarProdutos">Tentar novamente</button>
+                        </div>
                     </div>
                 }
 
                 @if (!produtos.Any())
                 {
-                    <div class="alert alert-info mt-3">Nenhum produto cadastrado.</div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0">Nenhum produto cadastrado.</div>
+                    </div>
                 }
                 else
                 {
-                    <table class="table table-sm mt-3">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Preço</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var p in produtos)
-                            {
+                    <div class="table-responsive @(offline ? "mt-3" : null)">
+                        <table class="table table-hover align-middle">
+                            <thead>
                                 <tr>
-                                    <td>@p.Nome</td>
-                                    <td>@p.Preco.ToString("C")</td>
+                                    <th>Nome</th>
+                                    <th class="text-end">Preço</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in produtos)
+                                {
+                                    <tr>
+                                        <td>@p.Nome</td>
+                                        <td class="text-end">@p.Preco.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             }
-        </div>
+        </section>
     </div>
 </div>
 

@@ -1,7 +1,45 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Aula 10 - Blazor WebAssembly</PageTitle>
 
-<h1>Hello, world!</h1>
+<header class="page-header">
+    <h1>Blazor WebAssembly</h1>
+    <p class="text-secondary mb-0">
+        Uma SPA que roda no navegador e conversa com uma API ASP.NET Core por HTTP.
+    </p>
+</header>
 
-Welcome to your new app.
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h6">Client-side</h2>
+                <p class="text-secondary mb-0">
+                    O código .NET roda no navegador. O banco só é acessado pela API, nunca direto pelo front.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h6">Consumo de API</h2>
+                <p class="text-secondary mb-0">
+                    Lista e cadastro de produtos em <code>/api/produtos</code>, com estados de carregamento e erro.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h6">PWA e offline</h2>
+                <p class="text-secondary mb-0">
+                    Instalável, com cache do app e da última lista de produtos para abrir sem conexão.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a class="btn btn-primary" href="produtos">Ir para Produtos</a>

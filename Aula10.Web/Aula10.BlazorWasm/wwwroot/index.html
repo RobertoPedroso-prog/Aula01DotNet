@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aula10.BlazorWasm</title>
+    <meta name="theme-color" content="#0f172a" />
+    <title>Aula 10 - Blazor WebAssembly</title>
     <base href="/" />
     <link rel="preload" id="webassembly" />
+    <!-- Tema claro/escuro conforme a preferência do sistema (Bootstrap 5.3: data-bs-theme). Roda antes do CSS para não piscar. -->
+    <script>
+        (function () {
+            var escuro = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+            function aplicar() { document.documentElement.setAttribute('data-bs-theme', escuro && escuro.matches ? 'dark' : 'light'); }
+            aplicar();
+            if (escuro && escuro.addEventListener) escuro.addEventListener('change', aplicar);
+        })();
+    </script>
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -27,8 +37,8 @@
     </div>
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
+        Ocorreu um erro inesperado.
+        <a href="." class="reload">Recarregar</a>
         <span class="dismiss">🗙</span>
     </div>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>

@@ -1,41 +1,49 @@
-﻿@page "/weather"
+@page "/weather"
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
 <PageTitle>Weather</PageTitle>
 
-<h1>Weather</h1>
+<header class="page-header">
+    <h1>Weather</h1>
+    <p class="text-secondary mb-0">Exemplo do template: busca um arquivo JSON do próprio site.</p>
+</header>
 
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<div class="card">
+    @if (forecasts == null)
+    {
+        <div class="card-body d-flex align-items-center" role="status">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <span>Carregando...</span>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th class="text-end" aria-label="Temperatura em Celsius">Temp. (C)</th>
+                        <th class="text-end" aria-label="Temperatura em Fahrenheit">Temp. (F)</th>
+                        <th>Resumo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var forecast in forecasts)
+                    {
+                        <tr>
+                            <td>@forecast.Date.ToShortDateString()</td>
+                            <td class="text-end">@forecast.TemperatureC</td>
+                            <td class="text-end">@forecast.TemperatureF</td>
+                            <td>@forecast.Summary</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
 
 @code {
     private WeatherForecast[]? forecasts;
