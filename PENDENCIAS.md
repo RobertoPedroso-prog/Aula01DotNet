@@ -20,13 +20,16 @@ Atualizado em 2026-10-07.
 - [ ] Aviso MSB3277 nos testes: alinhar a versão do `Microsoft.EntityFrameworkCore.InMemory` com a do projeto web.
 - [ ] Decidir se `Aula07.Web/run.log`, `Backups-Supabase/` e `GUIA-FORMATACAO.md` (já estavam não rastreados) entram no git ou no `.gitignore`.
 
-- [ ] **Aula10 não commitada**: alterações em `Aula10.Api` (CORS, controller, Program), `Aula10.BlazorWasm` (Produtos.razor, ProdutoDto, NavMenu) e `Aula10.Web/PLANO.md`.
+- [x] Aula10 commitada e enviada em 2026-10-07 (commit a5fba74).
+- [x] Correção do Weather commitada em 2026-10-08: `Aula10.BlazorWasm/Pages/Weather.razor` passou a buscar `sample-data/weather.json` pelo endereço do próprio site; antes dava 404/"Failed to fetch" porque o `HttpClient` aponta para a API.
 
 ## Aula10
 
 - [ ] JWT (o PDF cita como próxima base): a API ainda não tem autenticação.
 - [ ] `dotnet-serve` foi instalado só numa pasta temporária; para o deploy local do PLANO rodar `dotnet tool install --global dotnet-serve`.
-- [ ] Produtos de teste criados pelo Claude via WASM: "Cabo USB" (R$ 25) em `hipermidia."Produtos"`.
+- [ ] Produtos de teste criados pelo Claude via WASM: "Cabo USB" (R$ 25) e "Retest Aula10" (R$ 33) em `hipermidia."Produtos"`.
+- [ ] Aviso NU1903 na API: `Microsoft.OpenApi 2.0.0` (vem com `Microsoft.AspNetCore.OpenApi`) tem vulnerabilidade conhecida de severidade alta; atualizar o pacote.
+- [ ] PWA: depois de publicar de novo, a versão antiga continua ativa até fechar todas as abas do site (atualização controlada do template). Para testar logo, desregistrar o service worker e limpar os caches no DevTools (Application).
 
 ## Testes que faltam
 

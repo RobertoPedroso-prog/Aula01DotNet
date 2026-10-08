@@ -1,5 +1,6 @@
 ﻿@page "/weather"
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <PageTitle>Weather</PageTitle>
 
@@ -41,7 +42,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        // O HttpClient aponta para a API (Program.cs); o arquivo de exemplo está no próprio site do WASM.
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>(Navigation.BaseUri + "sample-data/weather.json");
     }
 
     public class WeatherForecast
