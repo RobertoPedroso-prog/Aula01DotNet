@@ -1,6 +1,10 @@
 @page "/produtos"
+@using System.Text.Json
 @using Aula10.BlazorWasm.Models
 @inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Produtos</PageTitle>
 
 <div class="container mt-4">
     <h1>Produtos</h1>
@@ -22,10 +26,10 @@
                     <InputNumber class="form-control" @bind-Value="novoProduto.Preco" step="0.01" />
                 </div>
 
-                <button type="submit" class="btn btn-primary" disabled="@carregando">
-                    @if (carregando)
+                <button type="submit" class="btn btn-primary" disabled="@salvando">
+                    @if (salvando)
                     {
-                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                         <span>Salvando...</span>
                     }
                     else
@@ -34,52 +38,93 @@
                     }
                 </button>
 
-                @if (!string.IsNullOrEmpty(mensagemErro))
+                @if (!string.IsNullOrEmpty(erroSalvar))
                 {
-                    <div class="alert alert-danger mt-3">@mensagemErro</div>
+                    <div class="alert alert-danger mt-3" role="alert">@erroSalvar</div>
+                }
+                @if (!string.IsNullOrEmpty(sucessoSalvar))
+                {
+                    <div class="alert alert-success mt-3" role="status">@sucessoSalvar</div>
                 }
             </EditForm>
         </div>
 
         <div class="col-md-6">
-            <h5>Lista de Produtos</h5>
-            @if (produtos == null)
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Produtos</h5>
+                <button class="btn btn-sm btn-outline-secondary" @onclick="CarregarProdutos" disabled="@carregandoLista">
+                    Atualizar
+                </button>
+            </div>
+
+            @if (carregandoLista && produtos == null)
             {
-                <div class="alert alert-info">Carregando...</div>
+                <div class="d-flex align-items-center mt-3" role="status">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Carregando produtos...</span>
+                </div>
             }
-            else if (!produtos.Any())
+            else if (produtos == null)
             {
-                <div class="alert alert-warning">Nenhum produto cadastrado</div>
+                <div class="alert alert-danger mt-3" role="alert">
+                    <p class="mb-2">@erroLista</p>
+                    <button class="btn btn-sm btn-danger" @onclick="CarregarProdutos">Tentar novamente</button>
+                </div>
             }
             else
             {
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Preço</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var p in produtos)
-                        {
+                @if (offline)
+                {
+                    <div class="alert alert-warning mt-3" role="alert">
+                        Sem conexão com a API. Exibindo a última lista salva neste dispositivo
+                        (@(dataCache?.ToString("dd/MM/yyyy HH:mm"))).
+                        <button class="btn btn-sm btn-warning ms-2" @onclick="CarregarProdutos">Tentar novamente</button>
+                    </div>
+                }
+
+                @if (!produtos.Any())
+                {
+                    <div class="alert alert-info mt-3">Nenhum produto cadastrado.</div>
+                }
+                else
+                {
+                    <table class="table table-sm mt-3">
+                        <thead>
                             <tr>
-                                <td>@p.Nome</td>
-                                <td>@p.Preco.ToString("C")</td>
+                                <th>Nome</th>
+                                <th>Preço</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in produtos)
+                            {
+                                <tr>
+                                    <td>@p.Nome</td>
+                                    <td>@p.Preco.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
             }
         </div>
     </div>
 </div>
 
 @code {
+    private const string ChaveCache = "aula10.produtos";
+
     private List<ProdutoDto>? produtos;
     private ProdutoDto novoProduto = new();
-    private bool carregando = false;
-    private string mensagemErro = string.Empty;
+
+    private bool carregandoLista;
+    private bool salvando;
+    private bool offline;
+    private DateTime? dataCache;
+
+    private string erroLista = string.Empty;
+    private string erroSalvar = string.Empty;
+    private string sucessoSalvar = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,20 +133,42 @@
 
     private async Task CarregarProdutos()
     {
+        carregandoLista = true;
+        erroLista = string.Empty;
+
         try
         {
-            produtos = await Http.GetFromJsonAsync<List<ProdutoDto>>("api/produtos");
+            produtos = await Http.GetFromJsonAsync<List<ProdutoDto>>("api/produtos") ?? [];
+            offline = false;
+            await SalvarCache(produtos);
         }
         catch (Exception ex)
         {
-            mensagemErro = $"Erro ao carregar produtos: {ex.Message}";
+            // Cache offline simples: se a API falhar, mostra a última lista que deu certo.
+            var cache = await LerCache();
+            if (cache is not null)
+            {
+                produtos = cache.Produtos;
+                dataCache = cache.SalvoEm;
+                offline = true;
+            }
+            else
+            {
+                produtos = null;
+                erroLista = $"Não foi possível carregar os produtos ({ex.Message}).";
+            }
+        }
+        finally
+        {
+            carregandoLista = false;
         }
     }
 
     private async Task CriarProduto()
     {
-        carregando = true;
-        mensagemErro = string.Empty;
+        salvando = true;
+        erroSalvar = string.Empty;
+        sucessoSalvar = string.Empty;
 
         try
         {
@@ -109,20 +176,72 @@
             if (response.IsSuccessStatusCode)
             {
                 novoProduto = new();
+                sucessoSalvar = "Produto criado com sucesso.";
                 await CarregarProdutos();
             }
             else
             {
-                mensagemErro = $"Erro ao criar produto: {response.StatusCode}";
+                erroSalvar = await LerErro(response);
             }
         }
-        catch (Exception ex)
+        catch (HttpRequestException)
         {
-            mensagemErro = $"Erro: {ex.Message}";
+            erroSalvar = "Não foi possível falar com a API. Verifique a conexão e tente novamente.";
         }
         finally
         {
-            carregando = false;
+            salvando = false;
         }
     }
+
+    // Traduz a resposta de erro da API (ProblemDetails com "errors") em uma mensagem legível.
+    private static async Task<string> LerErro(HttpResponseMessage response)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            if (doc.RootElement.TryGetProperty("errors", out var errors))
+            {
+                var mensagens = errors.EnumerateObject()
+                    .SelectMany(e => e.Value.EnumerateArray().Select(m => m.GetString()))
+                    .Where(m => !string.IsNullOrWhiteSpace(m));
+                var texto = string.Join(" ", mensagens);
+                if (texto.Length > 0)
+                    return texto;
+            }
+        }
+        catch (JsonException)
+        {
+        }
+
+        return $"A API recusou o produto ({(int)response.StatusCode} {response.ReasonPhrase}).";
+    }
+
+    private async Task SalvarCache(List<ProdutoDto> lista)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(new ListaEmCache(DateTime.Now, lista));
+            await JS.InvokeVoidAsync("localStorage.setItem", ChaveCache, json);
+        }
+        catch (JSException)
+        {
+            // localStorage indisponível (ex.: navegação privada): segue sem cache.
+        }
+    }
+
+    private async Task<ListaEmCache?> LerCache()
+    {
+        try
+        {
+            var json = await JS.InvokeAsync<string?>("localStorage.getItem", ChaveCache);
+            return json is null ? null : JsonSerializer.Deserialize<ListaEmCache>(json);
+        }
+        catch (Exception ex) when (ex is JSException or JsonException)
+        {
+            return null;
+        }
+    }
+
+    private sealed record ListaEmCache(DateTime SalvoEm, List<ProdutoDto> Produtos);
 }

@@ -20,10 +20,19 @@ Atualizado em 2026-10-07.
 - [ ] Aviso MSB3277 nos testes: alinhar a versão do `Microsoft.EntityFrameworkCore.InMemory` com a do projeto web.
 - [ ] Decidir se `Aula07.Web/run.log`, `Backups-Supabase/` e `GUIA-FORMATACAO.md` (já estavam não rastreados) entram no git ou no `.gitignore`.
 
+- [ ] **Aula10 não commitada**: alterações em `Aula10.Api` (CORS, controller, Program), `Aula10.BlazorWasm` (Produtos.razor, ProdutoDto, NavMenu) e `Aula10.Web/PLANO.md`.
+
+## Aula10
+
+- [ ] JWT (o PDF cita como próxima base): a API ainda não tem autenticação.
+- [ ] `dotnet-serve` foi instalado só numa pasta temporária; para o deploy local do PLANO rodar `dotnet tool install --global dotnet-serve`.
+- [ ] Produtos de teste criados pelo Claude via WASM: "Cabo USB" (R$ 25) em `hipermidia."Produtos"`.
+
 ## Testes que faltam
 
 - [ ] Aula09: botão **Cancelar** da edição; preço mínimo de **Livros** (R$ 10); excluir produto que está em edição.
-- [ ] Aulas 04 a 07 e 10: só foi feito teste de fumaça (a página inicial respondeu 200 com o schema `hipermidia`). Falta testar o CRUD, o login da Aula07 (Identity agora em `hipermidia`) e o Blazor WASM da Aula10.
+- [ ] Aulas 04 a 07: só foi feito teste de fumaça (a página inicial respondeu 200 com o schema `hipermidia`). Falta testar o CRUD e o login da Aula07 (Identity agora em `hipermidia`).
+- [ ] Aula10: a lista com erro e sem cache (caminho "Tentar novamente" sem lista salva) não foi testada; o resto foi testado no navegador (GET, POST, validação, offline, PWA publicado).
 - [ ] Aula08/Aula09: se o `Produtos` em `ProdutoDetalhe` deve mostrar o Estoque (hoje não mostra).
 
 ## Melhorias opcionais

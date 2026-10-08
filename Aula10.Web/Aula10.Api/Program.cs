@@ -20,7 +20,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWasm", policy =>
     {
-        policy.WithOrigins("https://localhost:5002")
+        // Ambiente local: aceita o WASM em qualquer porta de localhost (dev server, publish servido, etc.)
+        policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
@@ -38,7 +39,7 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-app.UseHttpsRedirection();
+// Sem UseHttpsRedirection: a API local responde em http://localhost:5233 e o redirect quebraria o preflight do CORS
 app.UseCors("AllowWasm");
 app.MapControllers();
 

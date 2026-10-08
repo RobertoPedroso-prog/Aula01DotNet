@@ -38,7 +38,7 @@ Aula10.Web/
 │   ├── Controllers/
 │   │   └── ProdutosController.cs (GET /api/produtos, POST /api/produtos)
 │   ├── Program.cs               (DbContext + CORS)
-│   ├── appsettings.json         (aula10 schema)
+│   ├── appsettings.json         (schema hipermidia)
 │   └── Aula10.Api.csproj
 │
 ├── Aula10.BlazorWasm/           (Blazor WASM - SPA)
@@ -78,15 +78,15 @@ dotnet sln add Aula10.Api/Aula10.Api.csproj
 
 **Program.cs:**
 - Registrar DbContext com factory (pooled, como Aula09)
-- Habilitar CORS para `https://localhost:5002` (porta WASM dev)
-- Adicionar migrations para schema `aula10`
+- Habilitar CORS para as origens `localhost` (WASM dev e publicado)
+- Adicionar migrations para schema `hipermidia`
 
 **Models (Produto, Categoria):**
 - Portar de Aula09.Web com mesmos campos
 - Adicionar data annotations para validação
 
 **DbContext + DbInitializer:**
-- Schema `aula10`
+- Schema `hipermidia` (compartilhado, migrations em Hipermidia.Data)
 - Seed: 2 categorias, 2+ produtos
 
 **ProdutosController:**
@@ -202,11 +202,11 @@ dotnet run  # HTTPS://localhost:5001
 
 # Terminal 2: WASM
 cd Aula10.BlazorWasm
-dotnet run  # HTTPS://localhost:5002
+dotnet run --launch-profile http  # http://localhost:5014
 ```
 
 **Casos:**
-1. ✅ Acessar https://localhost:5002 → carrega lista de produtos
+1. ✅ Acessar http://localhost:5014 → carrega lista de produtos
 2. ✅ Preencher formulário → POST bem-sucedido → lista atualiza
 3. ✅ Preencher inválido → validação client-side rejeita
 4. ✅ Parar API → WASM mostra erro (ou cache offline se implementado)
@@ -219,13 +219,12 @@ dotnet run  # HTTPS://localhost:5002
 cd Aula10.BlazorWasm
 dotnet publish -c Release
 
-# Saída: bin/Release/net8.0/publish/wwwroot
+# Saída: bin/Release/net10.0/publish/wwwroot
 
-# Servir localmente
+# Servir localmente (a API precisa estar rodando em http://localhost:5233)
 dotnet tool install --global dotnet-serve
-cd bin/Release/net8.0/publish/wwwroot
-dotnet serve -d .
-# Acessa em http://localhost:8080
+dotnet serve -d bin/Release/net10.0/publish/wwwroot -p 5050 --fallback-file index.html --gzip --brotli
+# Acessa em http://localhost:5050
 ```
 
 ### 9. PLANO.md Final
@@ -247,7 +246,7 @@ Documentar:
 - [ ] Aula10.BlazorWasm compila
 
 ### Database
-- [ ] `dotnet ef database update --project Aula10.Api` cria schema `aula10`
+- [ ] `dotnet ef database update --project Aula10.Api` cria schema `hipermidia`
 - [ ] Seed data popula Produtos/Categorias
 - [ ] PostgreSQL acessível em localhost:54322
 
@@ -255,11 +254,11 @@ Documentar:
 - [ ] Roda em https://localhost:5001
 - [ ] GET /api/produtos retorna JSON array com 2+ produtos
 - [ ] POST /api/produtos cria novo e retorna 201 Created
-- [ ] CORS permite origem https://localhost:5002
+- [ ] CORS permite origens localhost (5014 dev, 5050 publicado)
 - [ ] Validação: rejeita preço <= 0 com BadRequest
 
 ### WASM (Aula10.BlazorWasm)
-- [ ] Roda em https://localhost:5002
+- [ ] Roda em http://localhost:5014
 - [ ] Página Produtos carrega lista via HTTP
 - [ ] Exibe loading enquanto busca
 - [ ] Formulário valida (client-side) antes de enviar
@@ -284,81 +283,46 @@ Documentar:
 
 ---
 
-## Status de Implementação (2026-09-29)
+## Status de Implementação (2026-10-07)
 
-### ✅ Implementado e Testado
+Revisado contra `Aula_10.pdf` (Resultado Esperado e Atividade Avaliativa).
 
-**Aula10.Api (WebAPI)**
-- Controllers: ProdutosController com GET e POST ✅
-- Models: Produto e Categoria com validações ✅
-- DbContext: AppDbContext configurado com PostgreSQL ✅
-- Migrations: InitialCreate executada, banco criado ✅
-- Seed Data: 3 produtos (Notebook, Mouse, Clean Code) ✅
-- CORS: Habilitado para localhost ✅
-- API rodando em http://localhost:5233/api/produtos ✅
-- Teste: GET /api/produtos retorna [Notebook, Mouse, Clean Code] com HTTP 200 ✅
+### Atividade Avaliativa
 
-**Aula10.BlazorWasm (WASM SPA)**
-- Scaffold: Criado com template `dotnet new blazorwasm --pwa` ✅
-- Program.cs: HttpClient configurado para API ✅
-- Pages/Produtos.razor: Página criada com GET e POST forms ✅
-- ProdutoDto: Model para serialização ✅
-- PWA: manifest.webmanifest + service-worker.js configurados ✅
-- Compilação: Projeto compila sem erros ✅
-- Servidor: Rodando em http://localhost:5014 ✅
+| # | Item | Onde está | Situação |
+|---|------|-----------|----------|
+| 1 | Criar POST de Produto na API | `ProdutosController.PostProduto` (DataAnnotations no DTO; 400 com mensagens; categoria opcional, padrão = primeira) | Atendido |
+| 2 | Consumir POST no WASM | `Pages/Produtos.razor` → `Http.PostAsJsonAsync` | Atendido |
+| 3 | Exibir loading e erro | Spinner ao carregar e ao salvar; erro da lista com **Tentar novamente**; erro do POST traduz o ProblemDetails da API | Atendido |
+| 4 | Cache offline simples | Lista salva em `localStorage` a cada GET bem-sucedido; sem API, mostra a última lista com aviso e data. Além disso o service worker publicado guarda o app inteiro (PWA) | Atendido |
 
-### ⚠️ Em Progresso
+### Resultado Esperado
 
-**WASM Carregamento**
-- Página carrega até "Loading" screen
-- Possível issue: dotnet.js module loading (MIME type ou compilação)
-- Solução: Pode exigir ajuste de launchSettings.json ou clean build
+- SPA funcional em Blazor WASM consumindo a API real (lista e cadastro): testado no navegador.
+- PWA: `manifest.webmanifest`, ícones e service worker; no build publicado o service worker fica ativo com cache `offline-cache-*` (84 itens) e o app abre com o servidor e a API desligados.
+- Deploy local: `dotnet publish -c Release` + `dotnet serve` (porta 5050) funcionando.
+- Validação dupla: DataAnnotations no DTO do WASM (cliente) e no DTO da API (servidor).
 
-### 🔧 Próximos Passos (Se Continuar)
+### Ajustes feitos nesta revisão
 
-1. Investigar erro de module loading do dotnet.js
-2. Testar com `dotnet build -c Release` 
-3. Verificar MIME types do servidor
-4. Validar CORS headers completos
+- **CORS**: a policy só liberava `https://localhost:5002`, mas o WASM roda em `http://localhost:5014` (dev) ou `:5050` (publicado); agora aceita qualquer origem `localhost`. Removido `UseHttpsRedirection` (a API local é HTTP e o redirect quebra o preflight).
+- Link **Produtos** no menu do WASM (a página existia, mas não havia como chegar nela).
+- Banco: a API usa o schema compartilhado `hipermidia` (migrations em `Hipermidia.Data`), não mais um schema `hipermidia`.
+- O carregamento "parado em Loading" anotado em 2026-09-29 era só o primeiro download do runtime WASM (dezenas de arquivos); depois fica em cache e abre rápido.
 
----
+### Como rodar
 
-## Status Final Esperado
+```bash
+# Terminal 1: API (http://localhost:5233)
+dotnet run --project Aula10.Api --launch-profile http
 
-```
-✅ Aula10.Api
-  - ProdutosController (GET /api/produtos, POST /api/produtos/{id})
-  - DbContext + migrations (schema aula10)
-  - Seed: 2 categorias, 2+ produtos
-  - CORS habilitado para localhost:5002
-
-✅ Aula10.BlazorWasm
-  - SPA funcional em Blazor WASM
-  - HttpClient injetado + consumo de API
-  - Página Produtos com GET e POST
-  - Estados: loading, erro, sucesso
-  - PWA manifest + service worker
-
-✅ PWA
-  - Instalável em desktop/mobile
-  - Cache offline funcional
-  - Offline fallback para GET /api/produtos
-
-✅ Validação Dupla
-  - Client-side: data annotations
-  - Server-side: ModelState + regras customizadas
-
-✅ Documentação
-  - PLANO.md atualizado com implementação
-  - Git commit com testes e screenshots
+# Terminal 2: WASM em desenvolvimento (http://localhost:5014)
+dotnet run --project Aula10.BlazorWasm --launch-profile http
 ```
 
----
+No primeiro acesso o WASM leva alguns segundos para baixar o runtime.
 
-## Próximos Passos (Futuro)
+### Observações
 
-- [ ] Autenticação JWT
-- [ ] Cache inteligente (Workbox)
-- [ ] Paginação de produtos
-- [ ] Componentes compartilhados (class library)
-- [ ] E2E testing (Playwright)
+- O service worker de desenvolvimento (`service-worker.js`) não faz cache; o modo offline completo só existe no build publicado (`service-worker.published.js`).
+- A API não tem autenticação; JWT fica como evolução (o PDF cita como próxima base).
